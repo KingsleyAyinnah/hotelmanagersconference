@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container">
 <h1 class="sub-hero-title">Reserve Your <span class="shine">Seat</span></h1>
 <div class="sub-hero-breadcrumbs">
-<a href="index.php">Home</a> &nbsp;»&nbsp; Buy Tickets
+<a href="./">Home</a> &nbsp;»&nbsp; Buy Tickets
 </div>
 </div>
 </section>
@@ -256,7 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="alert alert-success"><?php echo $success_msg; ?></div>
                 <?php endif; ?>
 
-                <form method="POST" action="tickets.php">
+                <form method="POST" action="tickets">
                     <div class="form-group">
                         <label class="form-label" for="fullname">Full Name *</label>
                         <input type="text" name="fullname" id="fullname" class="form-input" required placeholder="e.g. John Doe" value="<?php echo isset($_POST['fullname']) && !$form_submitted ? htmlspecialchars($_POST['fullname']) : ''; ?>">

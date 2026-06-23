@@ -17,7 +17,7 @@ if ($pdo) {
 <div class="container">
 <h1 class="sub-hero-title">Event <span class="shine">Gallery</span></h1>
 <div class="sub-hero-breadcrumbs">
-<a href="index.php">Home</a> &nbsp;»&nbsp; Gallery
+<a href="./">Home</a> &nbsp;»&nbsp; Gallery
 </div>
 </div>
 </section>
@@ -171,7 +171,7 @@ if ($pdo) {
     <p style="color: rgba(45,26,16,0.85); font-size: 15px; line-height: 1.8; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto;">
         Join 900+ industry colleagues live at Lagos Continental. Secure your ticket today to participate in all conference sessions, cocktail dinners, and awards gala.
     </p>
-    <a href="tickets.php" class="btn-primary">Reserve My Seat Now →</a>
+    <a href="tickets" class="btn-primary">Reserve My Seat Now →</a>
 </div>
 </section>
 

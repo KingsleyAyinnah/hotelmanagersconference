@@ -1,5 +1,5 @@
 <?php
-require_once 'config.php';
+require_once '../config/config.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,6 +10,7 @@ require_once 'config.php';
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<base href="<?php echo htmlspecialchars($project_base); ?>">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -638,7 +639,7 @@ footer{padding:44px 0 20px}
 <div class="header-nav-container">
     <div class="container">
         <nav class="header-nav">
-            <a href="index.php" class="nav-logo">
+            <a href="./" class="nav-logo">
                 <img src="https://hotelmanagersconference.com/landingpage/images/hmc_logo.png" alt="HMC Africa" style="height: 40px;">
             </a>
             
@@ -653,7 +654,7 @@ footer{padding:44px 0 20px}
                     <?php foreach ($menu_items as $name => $link): ?>
                         <?php 
                             // Determine if this item is the active page
-                            $active_class = ($current_page === $link) ? 'class="active"' : '';
+                            $active_class = (basename($current_page, '.php') === $link) ? 'class="active"' : '';
                         ?>
                         <li><a href="<?php echo htmlspecialchars($link); ?>" <?php echo $active_class; ?>><?php echo htmlspecialchars($name); ?></a></li>
                     <?php endforeach; ?>

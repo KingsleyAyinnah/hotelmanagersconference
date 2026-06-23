@@ -1,5 +1,5 @@
 <?php
-require_once 'config.php';
+require_once '../config/config.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,6 +10,7 @@ require_once 'config.php';
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<base href="<?php echo htmlspecialchars($project_base); ?>">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -439,7 +440,7 @@ section{padding:60px 0}
 <div class="container">
 <!-- NAV — Logo + Register only -->
 <nav class="hero-nav">
-<a href="index.php" class="nav-logo">
+<a href="./" class="nav-logo">
 <img src="https://hotelmanagersconference.com/landingpage/images/hmc_logo.png" alt="HMC Africa" style="height: 40px;">
 </a>
 <a href="<?php echo htmlspecialchars($ticket_link); ?>" class="nav-cta">Reserve My Seat Now →</a>
@@ -1287,7 +1288,7 @@ The Future Of African Hospitality<br>
 <div class="container">
 <div class="footer-grid">
 <div>
-<a href="index.php" class="footer-brand">
+<a href="./" class="footer-brand">
 <img src="https://hotelmanagersconference.com/landingpage/images/hmc_logo.png" alt="HMC Africa" style="height: 40px;">
 </a>
 <p class="footer-desc">Hotel Managers Conference Africa is the continent's flagship gathering of hospitality leadership. Built by hoteliers, for hoteliers — to synergise for sustainable growth through global best practices.</p>

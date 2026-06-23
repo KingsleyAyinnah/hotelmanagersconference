@@ -158,8 +158,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     Strengthening the competitiveness of the African hospitality sector by improving sales performance, delivering exceptional service, and embracing adaptable standards.
                 </p>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <a href="tickets.php" class="btn-primary" style="padding: 12px 24px; font-size: 13px;">Register Here</a>
-                    <a href="about.php" class="btn-outline" style="padding: 11px 22px; font-size: 13px; border-color: rgba(253,247,240,0.35);">About Event</a>
+                    <a href="tickets" class="btn-primary" style="padding: 12px 24px; font-size: 13px;">Register Here</a>
+                    <a href="about" class="btn-outline" style="padding: 11px 22px; font-size: 13px; border-color: rgba(253,247,240,0.35);">About Event</a>
                 </div>
             </div>
         </div>
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         Through the exchange of ideas, industry insights, and collaborative partnerships, participants will explore ways to build a stronger, more resilient, and globally competitive hospitality industry for the continent.
                     </p>
                 </div>
-                <a href="about.php" class="btn-cta-outline" style="border: 2px solid var(--maroon-800); color: var(--maroon-900); font-weight: 700; padding: 12px 28px;">Read More</a>
+                <a href="about" class="btn-cta-outline" style="border: 2px solid var(--maroon-800); color: var(--maroon-900); font-weight: 700; padding: 12px 28px;">Read More</a>
             </div>
             
             <!-- Right Side Graphic Overlay (Theme Illustration) -->
@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <div class="text-center" style="margin-top: 40px;">
-            <a href="speakers.php" class="btn-cta-outline" style="border: 2px solid var(--maroon-800); color: var(--maroon-900); font-weight: 700; padding: 12px 28px;">All Speakers</a>
+            <a href="speakers" class="btn-cta-outline" style="border: 2px solid var(--maroon-800); color: var(--maroon-900); font-weight: 700; padding: 12px 28px;">All Speakers</a>
         </div>
     </div>
 </section>
@@ -483,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 }
                             ?>
                         </div>
-                        <a href="tickets.php?ticket_type=<?php echo urlencode($t['name']); ?>" class="<?php echo $btn_class; ?>" style="margin-top: auto;">Make Payment</a>
+                        <a href="tickets?ticket_type=<?php echo urlencode($t['name']); ?>" class="<?php echo $btn_class; ?>" style="margin-top: auto;">Make Payment</a>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -542,14 +542,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p style="color: rgba(45,26,16,0.8); font-size: 15px; line-height: 1.75; margin-bottom: 24px;">
                     The HMC Africa Awards celebrate the properties, management teams, and service innovators raising standard quality criteria across the continent. Review the benchmarks met by previous winners.
                 </p>
-                <a href="awards.php" class="btn-primary" style="padding: 12px 28px;">See Winners of HMC 2025 Awards</a>
+                <a href="awards" class="btn-primary" style="padding: 12px 28px;">See Winners of HMC 2025 Awards</a>
             </div>
             
             <div style="background: linear-gradient(135deg, var(--maroon-900) 0%, var(--maroon-950) 100%); color: var(--cream); border-radius: 20px; padding: 40px; border: 1px solid var(--gold-400); text-align: center;">
                 <span style="font-size: 48px; margin-bottom: 12px; display: block;">🏆</span>
                 <h3 class="font-display" style="font-size: 20px; color: var(--gold-200); margin-bottom: 8px;">2026 Nominations Open</h3>
                 <p style="font-size: 13px; opacity: 0.8; margin-bottom: 20px; line-height: 1.6;">Nominations for General Manager of the Year, Boutique Hotel, and training brands close June 15, 2026.</p>
-                <a href="awards.php#nominate" style="color: var(--gold-300); text-decoration: underline; font-weight: 700; font-size: 14px;">Submit Nomination →</a>
+                <a href="awards#nominate" style="color: var(--gold-300); text-decoration: underline; font-weight: 700; font-size: 14px;">Submit Nomination →</a>
             </div>
         </div>
     </div>
@@ -808,7 +808,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
                                 <span><?php echo htmlspecialchars($h['address']); ?></span>
                             </div>
-                            <a href="hotels.php" class="partner-hotel-btn">View Special Rates →</a>
+                            <a href="hotels" class="partner-hotel-btn">View Special Rates →</a>
                         </div>
                     </div>
                 <?php endforeach; ?>

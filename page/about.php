@@ -8,7 +8,7 @@ require_once 'header.php';
 <div class="container">
 <h1 class="sub-hero-title">About <span class="shine">HMC Africa</span></h1>
 <div class="sub-hero-breadcrumbs">
-<a href="index.php">Home</a> &nbsp;»&nbsp; About Us
+<a href="./">Home</a> &nbsp;»&nbsp; About Us
 </div>
 </div>
 </section>
@@ -98,7 +98,7 @@ require_once 'header.php';
         </p>
     </div>
     <div class="text-center" style="margin-top: 48px;">
-        <a href="tickets.php" class="btn-primary">Reserve My Seat Now →</a>
+        <a href="tickets" class="btn-primary">Reserve My Seat Now →</a>
     </div>
 </div>
 </section>

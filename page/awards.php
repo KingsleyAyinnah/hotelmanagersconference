@@ -17,7 +17,7 @@ if ($pdo) {
 <div class="container">
 <h1 class="sub-hero-title">HMC Africa <span class="shine">Awards 2026</span></h1>
 <div class="sub-hero-breadcrumbs">
-<a href="index.php">Home</a> &nbsp;»&nbsp; Awards
+<a href="./">Home</a> &nbsp;»&nbsp; Awards
 </div>
 </div>
 </section>

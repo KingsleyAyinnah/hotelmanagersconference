@@ -17,7 +17,7 @@ if ($pdo) {
 <div class="container">
 <h1 class="sub-hero-title">Partner <span class="shine">Hotels</span></h1>
 <div class="sub-hero-breadcrumbs">
-<a href="index.php">Home</a> &nbsp;»&nbsp; Partner Hotels
+<a href="./">Home</a> &nbsp;»&nbsp; Partner Hotels
 </div>
 </div>
 </section>
@@ -220,7 +220,7 @@ if ($pdo) {
             Our airport pickup, transportation, and visa support committee can assist you. Speak with us to fast-track bookings.
         </p>
         <div class="cta-block-btns" style="justify-content: center;">
-            <a href="tickets.php?ticket_type=Combo+Package" class="btn-cta-primary" style="background: var(--gold-400); color: var(--maroon-950); text-decoration: none;">Book Combo Package →</a>
+            <a href="tickets?ticket_type=Combo+Package" class="btn-cta-primary" style="background: var(--gold-400); color: var(--maroon-950); text-decoration: none;">Book Combo Package →</a>
             <a href="tel:<?php echo $phone_number_link; ?>" class="btn-cta-outline" style="border-color: var(--gold-400); color: var(--gold-300);">📞 Contact Concierge</a>
         </div>
     </div>

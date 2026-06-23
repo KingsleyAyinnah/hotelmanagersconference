@@ -17,7 +17,7 @@ if ($pdo) {
 <div class="container">
 <h1 class="sub-hero-title">Our <span class="shine">Speakers</span></h1>
 <div class="sub-hero-breadcrumbs">
-<a href="index.php">Home</a> &nbsp;»&nbsp; Speakers
+<a href="./">Home</a> &nbsp;»&nbsp; Speakers
 </div>
 </div>
 </section>

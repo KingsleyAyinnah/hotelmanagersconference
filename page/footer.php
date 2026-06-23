@@ -20,7 +20,7 @@
 <div class="footer-heading">Register</div>
 <ul class="footer-links">
 <li><a href="<?php echo htmlspecialchars($ticket_link); ?>" style="color:var(--gold-300);font-weight:700">Reserve My Seat Now →</a></li>
-<li><a href="<?php echo htmlspecialchars($current_page === 'index.php' ? '#tickets' : 'tickets.php'); ?>">Ticket Options</a></li>
+<li><a href="<?php echo htmlspecialchars(($current_page === 'index.php' || $current_page === 'landing.php') ? '#tickets' : 'tickets'); ?>">Ticket Options</a></li>
 <li><a href="tel:<?php echo $phone_number_link; ?>">Call Us</a></li>
 <li><a href="mailto:<?php echo htmlspecialchars($email); ?>">Email Us</a></li>
 </ul>

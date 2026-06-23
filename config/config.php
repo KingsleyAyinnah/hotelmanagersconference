@@ -1,7 +1,12 @@
 <?php
 // Central Configuration File for Hotel Managers Conference Africa (HMC Africa)
 
-require_once 'db.php';
+// Calculate dynamic project base directory for clean URLs and absolute assets
+$script_name = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+$base_dir = !empty($script_name) ? str_replace(basename($script_name), '', $script_name) : '/';
+$project_base = preg_replace('/(page|admin)\/$/', '', $base_dir);
+
+require_once __DIR__ . '/db.php';
 
 // Default fallback settings
 $phone_number_display = '+234 911 236 8692';
@@ -11,7 +16,7 @@ $event_date = 'July 11 & 12, 2026';
 $event_date_range = 'July 11–12, 2026';
 $event_location = 'Lagos Continental Hotel, Victoria Island';
 $event_location_short = 'Lagos Continental Hotel';
-$ticket_link = 'tickets.php';
+$ticket_link = 'tickets';
 
 $header_announcement = '🏆 8th Annual Edition | July 11 & 12, 2026 | Lagos Continental Hotel, Victoria Island';
 $header_urgency = '🔥 EARLY BIRD CLOSING SOON — Save ₦50,000 when you register before the deadline';
@@ -46,16 +51,17 @@ if ($pdo) {
     }
 }
 
-// Navigation Menu Items
+// Navigation Menu Items (Clean URLs format)
 $menu_items = [
-    'About' => 'about.php',
-    'Speakers' => 'speakers.php',
-    'Buy Tickets' => 'tickets.php',
-    'Awards' => 'awards.php',
-    'Partner Hotels' => 'hotels.php',
-    'Gallery' => 'gallery.php'
+    'About' => 'about',
+    'Speakers' => 'speakers',
+    'Buy Tickets' => 'tickets',
+    'Awards' => 'awards',
+    'Partner Hotels' => 'hotels',
+    'Gallery' => 'gallery'
 ];
 
 // Helper to determine the current page filename
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
+
