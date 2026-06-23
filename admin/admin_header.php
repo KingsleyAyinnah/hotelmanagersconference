@@ -30,11 +30,11 @@ if ($pdo) {
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --maroon-950: #1a0510;
-            --maroon-900: #2d0a1e;
-            --maroon-800: #4a1030;
-            --maroon-700: #6b1a43;
-            --maroon-600: #882255;
+            --maroon-950: #1c0003;
+            --maroon-900: #380007;
+            --maroon-800: #5c030d;
+            --maroon-700: #880515;
+            --maroon-600: #ad071b;
             --gold-200: #f5e6a3;
             --gold-300: #e8cc6a;
             --gold-400: #d4af37;
@@ -433,7 +433,7 @@ if ($pdo) {
         .form-input:focus, .form-textarea:focus, .form-select:focus {
             outline: none;
             border-color: var(--maroon-700);
-            box-shadow: 0 0 0 3px rgba(107, 26, 67, 0.1);
+            box-shadow: 0 0 0 3px rgba(136, 5, 21, 0.1);
         }
 
         .form-textarea {
@@ -487,7 +487,7 @@ if ($pdo) {
         .upload-drop-zone:hover,
         .upload-drop-zone.drag-over {
             border-color: var(--maroon-700);
-            background: rgba(107, 26, 67, 0.03);
+            background: rgba(136, 5, 21, 0.03);
         }
 
         .upload-drop-zone input[type="file"] {

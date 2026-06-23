@@ -86,7 +86,7 @@ if ($pdo) {
     .gallery-info-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(to top, rgba(26,5,16,0.95) 20%, rgba(26,5,16,0.25));
+        background: linear-gradient(to top, rgba(28,0,3,0.95) 20%, rgba(28,0,3,0.25));
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
@@ -152,7 +152,7 @@ if ($pdo) {
                     elseif (strtolower($item['category']) === 'awards') $cat_display = 'Awards Gala';
                 ?>
                 <div class="gallery-card-item" data-category="<?php echo htmlspecialchars($item['category']); ?>" <?php echo $bg_style; ?>>
-                    <div class="gallery-info-overlay" style="background: linear-gradient(to top, rgba(26,5,16,0.95) 20%, rgba(26,5,16,0.15) 100%);">
+                    <div class="gallery-info-overlay" style="background: linear-gradient(to top, rgba(28,0,3,0.95) 20%, rgba(28,0,3,0.15) 100%);">
                         <span><?php echo htmlspecialchars($cat_display); ?></span>
                         <h4><?php echo htmlspecialchars($item['title']); ?></h4>
                         <p><?php echo htmlspecialchars($item['description']); ?></p>

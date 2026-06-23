@@ -53,7 +53,7 @@ if ($pdo) {
                 </video>
                 
                 <!-- Sound Toggle Icon Button -->
-                <button id="soundToggleBtn" style="position: absolute; top: 16px; right: 16px; z-index: 10; background: rgba(26, 5, 16, 0.85); border: 1.5px solid var(--gold-400); color: var(--gold-300); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.35);" title="Mute Sound">
+                <button id="soundToggleBtn" style="position: absolute; top: 16px; right: 16px; z-index: 10; background: rgba(28, 0, 3, 0.85); border: 1.5px solid var(--gold-400); color: var(--gold-300); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.35);" title="Mute Sound">
                     <span id="soundIcon" style="font-size: 18px; line-height: 1;">🔊</span>
                 </button>
             </div>

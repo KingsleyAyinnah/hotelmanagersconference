@@ -34,10 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --maroon-950: #1a0510;
-            --maroon-900: #2d0a1e;
-            --maroon-800: #4a1030;
-            --maroon-700: #6b1a43;
+            --maroon-950: #1c0003;
+            --maroon-900: #380007;
+            --maroon-800: #5c030d;
+            --maroon-700: #880515;
             --gold-300: #e8cc6a;
             --gold-400: #d4af37;
             --gold-500: #b8942a;
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .login-card {
-            background: rgba(45, 10, 30, 0.45);
+            background: rgba(56, 0, 7, 0.45);
             border: 1px solid rgba(212, 175, 55, 0.25);
             border-radius: 20px;
             padding: 40px 32px;
@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .form-input {
             width: 100%;
-            background: rgba(26, 5, 16, 0.6);
+            background: rgba(28, 0, 3, 0.6);
             border: 1px solid rgba(253, 247, 240, 0.15);
             border-radius: 8px;
             padding: 12px 16px;
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-input:focus {
             outline: none;
             border-color: var(--gold-400);
-            background: rgba(26, 5, 16, 0.85);
+            background: rgba(28, 0, 3, 0.85);
             box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
         }
 

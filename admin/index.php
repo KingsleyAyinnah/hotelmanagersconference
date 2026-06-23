@@ -53,7 +53,7 @@ if ($pdo) {
         width: 52px;
         height: 52px;
         border-radius: 10px;
-        background: rgba(107, 26, 67, 0.08);
+        background: rgba(136, 5, 21, 0.08);
         color: var(--maroon-900);
         display: flex;
         align-items: center;
@@ -94,7 +94,7 @@ if ($pdo) {
         padding: 32px;
         color: var(--cream);
         margin-bottom: 32px;
-        box-shadow: 0 10px 30px rgba(45, 10, 30, 0.15);
+        box-shadow: 0 10px 30px rgba(56, 0, 7, 0.15);
     }
 
     .welcome-banner h1 {

@@ -80,7 +80,7 @@ if ($pdo) {
     .hotel-img-panel .hotel-img-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(to top, rgba(26,5,16,0.88) 0%, rgba(26,5,16,0.2) 65%, transparent 100%);
+        background: linear-gradient(to top, rgba(28,0,3,0.88) 0%, rgba(28,0,3,0.2) 65%, transparent 100%);
         display: flex;
         flex-direction: column;
         justify-content: flex-end;
