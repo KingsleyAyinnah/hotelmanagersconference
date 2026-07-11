@@ -17,18 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = trim($_POST['description']);
         $icon        = trim($_POST['icon']);
         $image       = trim($_POST['image']); // Cloudinary URL
+        $year        = isset($_POST['year']) ? intval($_POST['year']) : 2026;
 
-        if (empty($name) || empty($description)) {
-            $error_message = 'Award Name and Description are required fields.';
+        if (empty($name)) {
+            $error_message = 'Award Name is a required field.';
         } else {
             try {
                 if ($id > 0) {
-                    $stmt = $pdo->prepare("UPDATE `awards` SET `name` = :name, `description` = :description, `icon` = :icon, `image` = :image WHERE `id` = :id");
-                    $stmt->execute(['name' => $name, 'description' => $description, 'icon' => $icon, 'image' => $image, 'id' => $id]);
+                    $stmt = $pdo->prepare("UPDATE `awards` SET `name` = :name, `description` = :description, `icon` = :icon, `image` = :image, `year` = :year WHERE `id` = :id");
+                    $stmt->execute(['name' => $name, 'description' => $description, 'icon' => $icon, 'image' => $image, 'year' => $year, 'id' => $id]);
                     $success_message = 'Award category updated successfully.';
                 } else {
-                    $stmt = $pdo->prepare("INSERT INTO `awards` (`name`, `description`, `icon`, `image`) VALUES (:name, :description, :icon, :image)");
-                    $stmt->execute(['name' => $name, 'description' => $description, 'icon' => $icon, 'image' => $image]);
+                    $stmt = $pdo->prepare("INSERT INTO `awards` (`name`, `description`, `icon`, `image`, `year`) VALUES (:name, :description, :icon, :image, :year)");
+                    $stmt->execute(['name' => $name, 'description' => $description, 'icon' => $icon, 'image' => $image, 'year' => $year]);
                     $success_message = 'New award category created successfully.';
                 }
                 $action = 'list';
@@ -73,7 +74,7 @@ if ($action === 'edit' && $id > 0) {
 $awards = [];
 if ($action === 'list') {
     try {
-        $awards = $pdo->query("SELECT * FROM `awards` ORDER BY `id` ASC")->fetchAll();
+        $awards = $pdo->query("SELECT * FROM `awards` ORDER BY `year` DESC, `id` ASC")->fetchAll();
     } catch (PDOException $e) {
         $error_message = 'Failed to retrieve awards: ' . $e->getMessage();
     }
@@ -108,6 +109,7 @@ if ($action === 'list') {
                         <tr>
                             <th style="width: 70px; text-align: center;">Image</th>
                             <th>Category Name</th>
+                            <th style="width: 100px;">Year</th>
                             <th>Description</th>
                             <th style="width: 160px; text-align: right;">Actions</th>
                         </tr>
@@ -124,6 +126,9 @@ if ($action === 'list') {
                                 </td>
                                 <td style="font-weight: 600; color: var(--maroon-900);">
                                     <?php echo htmlspecialchars($aw['name']); ?>
+                                </td>
+                                <td style="font-weight: 600; color: var(--gold-600);">
+                                    <?php echo htmlspecialchars(isset($aw['year']) ? $aw['year'] : '2026'); ?>
                                 </td>
                                 <td style="max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     <?php echo htmlspecialchars($aw['description']); ?>
@@ -157,6 +162,11 @@ if ($action === 'list') {
                 </div>
 
                 <div class="form-group" style="flex: 1;">
+                    <label class="form-label" for="year">Award Year</label>
+                    <input type="number" id="year" name="year" class="form-input" required value="<?php echo ($award && isset($award['year'])) ? htmlspecialchars($award['year']) : '2026'; ?>" placeholder="e.g. 2026">
+                </div>
+
+                <div class="form-group" style="flex: 1;">
                     <label class="form-label" for="icon">Category Icon (Emoji — Fallback)</label>
                     <input type="text" id="icon" name="icon" class="form-input" value="<?php echo ($award) ? htmlspecialchars($award['icon']) : '🏆'; ?>" placeholder="e.g. 👔, 🏢, 🍽, 🏆" maxlength="10">
                     <small style="display:block; font-size:11px; color:#64748b; margin-top: 6px;">Shown on frontend if no image is uploaded.</small>
@@ -164,8 +174,8 @@ if ($action === 'list') {
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="description">Award Eligibility & Criteria Description</label>
-                <textarea id="description" name="description" class="form-textarea" required placeholder="Describe the evaluation metrics, who is eligible, what values are celebrated..."><?php echo ($award) ? htmlspecialchars($award['description']) : ''; ?></textarea>
+                <label class="form-label" for="description">Award Eligibility & Criteria Description (Optional)</label>
+                <textarea id="description" name="description" class="form-textarea" placeholder="Describe the evaluation metrics, who is eligible, what values are celebrated..."><?php echo ($award) ? htmlspecialchars($award['description']) : ''; ?></textarea>
             </div>
 
             <?php

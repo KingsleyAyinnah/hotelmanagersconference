@@ -14,30 +14,31 @@ $error_message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['save_gallery'])) {
         $category   = trim($_POST['category']);
-        $title      = trim($_POST['title']);
-        $description = trim($_POST['description']);
+        $year       = isset($_POST['year']) ? intval($_POST['year']) : 2026;
         $image_path = trim($_POST['image_path']); // Cloudinary URL from hidden input
 
-        if (empty($category) || empty($title)) {
-            $error_message = 'Category and Title are required fields.';
+        if (empty($category)) {
+            $category = 'general';
+        }
+
+        if (empty($image_path)) {
+            $error_message = 'Gallery Photo is a required field.';
         } else {
             try {
                 if ($id > 0) {
-                    $stmt = $pdo->prepare("UPDATE `gallery` SET `category` = :category, `title` = :title, `description` = :description, `image_path` = :image_path WHERE `id` = :id");
+                    $stmt = $pdo->prepare("UPDATE `gallery` SET `category` = :category, `year` = :year, `image_path` = :image_path WHERE `id` = :id");
                     $stmt->execute([
                         'category'   => $category,
-                        'title'      => $title,
-                        'description' => $description,
+                        'year'       => $year,
                         'image_path' => $image_path,
                         'id'         => $id
                     ]);
                     $success_message = 'Gallery item updated successfully.';
                 } else {
-                    $stmt = $pdo->prepare("INSERT INTO `gallery` (`category`, `title`, `description`, `image_path`) VALUES (:category, :title, :description, :image_path)");
+                    $stmt = $pdo->prepare("INSERT INTO `gallery` (`category`, `year`, `image_path`) VALUES (:category, :year, :image_path)");
                     $stmt->execute([
                         'category'   => $category,
-                        'title'      => $title,
-                        'description' => $description,
+                        'year'       => $year,
                         'image_path' => $image_path
                     ]);
                     $success_message = 'New gallery item added successfully.';
@@ -118,9 +119,8 @@ if ($action === 'list') {
                     <thead>
                         <tr>
                             <th style="width: 100px;">Preview</th>
-                            <th>Title</th>
+                            <th>Year</th>
                             <th>Category</th>
-                            <th>Description</th>
                             <th style="width: 160px; text-align: right;">Actions</th>
                         </tr>
                     </thead>
@@ -129,21 +129,18 @@ if ($action === 'list') {
                             <tr>
                                 <td>
                                     <?php if (!empty($item['image_path'])): ?>
-                                        <img src="<?php echo htmlspecialchars($item['image_path']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>" style="width: 80px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(0,0,0,0.08);">
+                                        <img src="<?php echo htmlspecialchars($item['image_path']); ?>" alt="Gallery Image" style="width: 80px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(0,0,0,0.08);">
                                     <?php else: ?>
                                         <div style="width: 80px; height: 52px; background: #e2e8f0; color: #94a3b8; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size:10px; font-weight:700; text-align:center;">No Image</div>
                                     <?php endif; ?>
                                 </td>
                                 <td style="font-weight: 600; color: var(--maroon-900);">
-                                    <?php echo htmlspecialchars($item['title']); ?>
+                                    <?php echo htmlspecialchars(isset($item['year']) ? $item['year'] : '2026'); ?>
                                 </td>
                                 <td>
                                     <span class="badge badge-accredited">
-                                        <?php echo htmlspecialchars($item['category']); ?>
+                                        <?php echo htmlspecialchars(isset($item['category']) ? $item['category'] : 'general'); ?>
                                     </span>
-                                </td>
-                                <td style="max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                    <?php echo htmlspecialchars($item['description']); ?>
                                 </td>
                                 <td style="text-align: right;">
                                     <a href="gallery.php?action=edit&id=<?php echo $item['id']; ?>" class="btn btn-gold btn-sm">Edit</a>
@@ -169,13 +166,14 @@ if ($action === 'list') {
 
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label" for="title">Image Caption Title</label>
-                    <input type="text" id="title" name="title" class="form-input" required value="<?php echo ($gallery_item) ? htmlspecialchars($gallery_item['title']) : ''; ?>" placeholder="e.g. Gala Dinner Celebrations">
+                    <label class="form-label" for="year">Gallery Year</label>
+                    <input type="number" id="year" name="year" class="form-input" required value="<?php echo ($gallery_item && isset($gallery_item['year'])) ? htmlspecialchars($gallery_item['year']) : '2026'; ?>" placeholder="e.g. 2026">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="category">Category Filter</label>
+                    <label class="form-label" for="category">Category Filter (Optional)</label>
                     <select id="category" name="category" class="form-select">
+                        <option value="general" <?php echo (!$gallery_item || $gallery_item['category'] === 'general') ? 'selected' : ''; ?>>General</option>
                         <option value="awards" <?php echo ($gallery_item && $gallery_item['category'] === 'awards') ? 'selected' : ''; ?>>Awards Gala Dinner</option>
                         <option value="panels" <?php echo ($gallery_item && $gallery_item['category'] === 'panels') ? 'selected' : ''; ?>>Panels & Discussions</option>
                         <option value="exhibits" <?php echo ($gallery_item && $gallery_item['category'] === 'exhibits') ? 'selected' : ''; ?>>Exhibits & Showcases</option>
@@ -193,11 +191,6 @@ if ($action === 'list') {
                 'optional'    => false
             ]);
             ?>
-
-            <div class="form-group" style="margin-top: 20px;">
-                <label class="form-label" for="description">Short Description Context</label>
-                <textarea id="description" name="description" class="form-textarea" placeholder="e.g. Presenting trophies to hotel managers of the year..."><?php echo ($gallery_item) ? htmlspecialchars($gallery_item['description']) : ''; ?></textarea>
-            </div>
 
             <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
                 <button type="submit" class="btn btn-primary">Save Gallery Photo</button>

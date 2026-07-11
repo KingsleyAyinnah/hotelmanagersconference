@@ -1,6 +1,6 @@
 <?php
 require_once 'auth.php';
-require_once '../config/db.php';
+require_once '../config/config.php';
 
 // Determine active page
 $active_script = basename($_SERVER['PHP_SELF']);
@@ -28,6 +28,7 @@ if ($pdo) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars($project_base); ?>images/favicon.png?v=2">
     <style>
         :root {
             --maroon-950: #1c0003;
@@ -678,7 +679,7 @@ if ($pdo) {
     <!-- Sidebar Menu Drawer -->
     <div class="sidebar" id="adminSidebar">
         <div class="sidebar-brand">
-            <img src="https://hotelmanagersconference.com/landingpage/images/hmc_logo.png" alt="HMC Africa Logo">
+            <img src="<?php echo htmlspecialchars($project_base); ?>images/logo.png" alt="HMC Africa Logo">
         </div>
         <ul class="sidebar-menu">
             <li class="sidebar-item">
@@ -712,8 +713,23 @@ if ($pdo) {
                 </a>
             </li>
             <li class="sidebar-item">
+                <a href="reservations.php" class="sidebar-link <?php echo ($active_script === 'reservations.php') ? 'active' : ''; ?>">
+                    <i>📅</i> Manage Reservations
+                </a>
+            </li>
+            <li class="sidebar-item">
                 <a href="gallery.php" class="sidebar-link <?php echo ($active_script === 'gallery.php') ? 'active' : ''; ?>">
                     <i>🖼️</i> Gallery Images
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="sponsors.php" class="sidebar-link <?php echo ($active_script === 'sponsors.php') ? 'active' : ''; ?>">
+                    <i>⭐</i> Sponsors & Partners
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="blog.php" class="sidebar-link <?php echo ($active_script === 'blog.php') ? 'active' : ''; ?>">
+                    <i>📰</i> News & Blog
                 </a>
             </li>
         </ul>

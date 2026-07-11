@@ -16,7 +16,7 @@ $event_date = 'July 11 & 12, 2026';
 $event_date_range = 'July 11–12, 2026';
 $event_location = 'Lagos Continental Hotel, Victoria Island';
 $event_location_short = 'Lagos Continental Hotel';
-$ticket_link = 'tickets';
+$ticket_link = 'https://forms.gle/ry9FiboPx33XobwK9';
 
 $header_announcement = '🏆 8th Annual Edition | July 11 & 12, 2026 | Lagos Continental Hotel, Victoria Island';
 $header_urgency = '🔥 EARLY BIRD CLOSING SOON — Save ₦50,000 when you register before the deadline';
@@ -63,5 +63,8 @@ $menu_items = [
 
 // Helper to determine the current page filename
 $current_page = basename($_SERVER['PHP_SELF']);
+
+// Load SMTP Mailer helper
+require_once __DIR__ . '/smtp_mailer.php';
 ?>
 

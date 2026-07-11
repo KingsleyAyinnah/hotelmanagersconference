@@ -1,23 +1,25 @@
 <?php
 // Database Setup & Seeding Script for Hotel Managers Conference Africa (HMC Africa)
 
-$host = 'localhost';
-$user = 'root';
-$pass = '';
+// Load connection settings from the central configuration
+require_once __DIR__ . '/config/db.php';
 
 try {
-    // 1. Connect to MySQL Server (host only)
-    $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $user, $pass, [
+    // 1. Connect to MySQL Server (host only, to ensure database can be created if missing)
+    $pdo_setup = new PDO("mysql:host=$host;charset=utf8mb4", $user, $pass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ]);
     echo "Connected to MySQL successfully.\n";
 
-    // 2. Create Database 'hmc'
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `hmc` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    echo "Database 'hmc' created or already exists.\n";
+    // 2. Create Database
+    $pdo_setup->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    echo "Database '$dbname' created or already exists.\n";
 
-    // 3. Connect to the 'hmc' Database
-    $pdo->exec("USE `hmc`");
+    // 3. Connect to the Database
+    $pdo_setup->exec("USE `$dbname`");
+    
+    // Assign setup connection to $pdo for the table creation/seeding queries below
+    $pdo = $pdo_setup;
 
     // 4. Create Tables
     
@@ -33,31 +35,79 @@ try {
         `id` INT AUTO_INCREMENT PRIMARY KEY,
         `name` VARCHAR(100) NOT NULL,
         `title` VARCHAR(255) NOT NULL,
-        `image` VARCHAR(255) NULL
+        `image` VARCHAR(255) NULL,
+        `category` VARCHAR(50) DEFAULT 'Speaker'
     ) ENGINE=InnoDB;");
     echo "Table 'speakers' verified.\n";
+
+    // Migrate Speakers table if it already exists
+    try {
+        $columns = [];
+        $stmt_cols = $pdo->query("DESCRIBE `speakers`");
+        while ($col = $stmt_cols->fetch(PDO::FETCH_ASSOC)) {
+            $columns[] = strtolower($col['Field']);
+        }
+        if (!in_array('category', $columns)) {
+            $pdo->exec("ALTER TABLE `speakers` ADD `category` VARCHAR(50) DEFAULT 'Speaker'");
+            echo "Added 'category' column to speakers table.\n";
+        }
+    } catch (PDOException $mig_err) {
+        echo "Speakers migration note: " . $mig_err->getMessage() . "\n";
+    }
 
     // Hotels Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS `hotels` (
         `id` INT AUTO_INCREMENT PRIMARY KEY,
         `name` VARCHAR(100) NOT NULL,
-        `description` TEXT NOT NULL,
+        `description` TEXT NULL,
         `address` VARCHAR(255) NOT NULL,
         `amenities` TEXT NULL,
         `price` VARCHAR(50) NULL,
-        `discount_code` VARCHAR(50) NULL,
-        `type` VARCHAR(50) NULL
+        `website_url` VARCHAR(500) NULL,
+        `type` VARCHAR(50) NULL,
+        `image` VARCHAR(500) NULL
     ) ENGINE=InnoDB;");
     echo "Table 'hotels' verified.\n";
+
+    // Migrate Hotels table columns if they already exist from older versions
+    try {
+        $pdo->exec("ALTER TABLE `hotels` MODIFY `description` TEXT NULL");
+        
+        $columns = [];
+        $stmt_cols = $pdo->query("DESCRIBE `hotels`");
+        while ($col = $stmt_cols->fetch(PDO::FETCH_ASSOC)) {
+            $columns[] = strtolower($col['Field']);
+        }
+        
+        if (in_array('discount_code', $columns) && !in_array('website_url', $columns)) {
+            $pdo->exec("ALTER TABLE `hotels` CHANGE `discount_code` `website_url` VARCHAR(500) NULL");
+            echo "Migrated 'discount_code' column to 'website_url' in hotels table.\n";
+        }
+        
+        if (!in_array('image', $columns)) {
+            $pdo->exec("ALTER TABLE `hotels` ADD `image` VARCHAR(500) NULL");
+            echo "Added 'image' column to hotels table.\n";
+        }
+    } catch (PDOException $mig_err) {
+        echo "Migration note: " . $mig_err->getMessage() . "\n";
+    }
 
     // Awards Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS `awards` (
         `id` INT AUTO_INCREMENT PRIMARY KEY,
         `name` VARCHAR(100) NOT NULL,
-        `description` TEXT NOT NULL,
-        `icon` VARCHAR(10) NULL
+        `description` TEXT NULL,
+        `icon` VARCHAR(10) NULL,
+        `year` INT DEFAULT 2026
     ) ENGINE=InnoDB;");
     echo "Table 'awards' verified.\n";
+
+    // Migrate Awards table if it already exists
+    try {
+        $pdo->exec("ALTER TABLE `awards` MODIFY `description` TEXT NULL");
+    } catch (PDOException $mig_err) {
+        echo "Awards migration note: " . $mig_err->getMessage() . "\n";
+    }
 
     // Tickets Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS `tickets` (
@@ -67,25 +117,81 @@ try {
         `price_ngn` VARCHAR(50) NOT NULL,
         `price_usd` VARCHAR(50) NOT NULL,
         `features` TEXT NULL,
-        `type` VARCHAR(50) NULL
+        `type` VARCHAR(50) NULL,
+        `is_international` INT DEFAULT 0
     ) ENGINE=InnoDB;");
     echo "Table 'tickets' verified.\n";
 
     // Gallery Table
     $pdo->exec("CREATE TABLE IF NOT EXISTS `gallery` (
         `id` INT AUTO_INCREMENT PRIMARY KEY,
-        `category` VARCHAR(50) NOT NULL,
-        `title` VARCHAR(100) NOT NULL,
-        `description` TEXT NULL,
+        `category` VARCHAR(50) NULL DEFAULT 'general',
+        `year` INT NULL DEFAULT 2026,
         `image_path` VARCHAR(500) NULL
     ) ENGINE=InnoDB;");
     echo "Table 'gallery' verified.\n";
 
+    // Migrate Gallery table if it already exists
+    try {
+        $columns = [];
+        $stmt_cols = $pdo->query("DESCRIBE `gallery`");
+        while ($col = $stmt_cols->fetch(PDO::FETCH_ASSOC)) {
+            $columns[] = strtolower($col['Field']);
+        }
+        if (!in_array('year', $columns)) {
+            $pdo->exec("ALTER TABLE `gallery` ADD `year` INT NULL DEFAULT 2026");
+            echo "Added 'year' column to gallery table.\n";
+        }
+        $pdo->exec("ALTER TABLE `gallery` MODIFY `category` VARCHAR(50) NULL DEFAULT 'general'");
+    } catch (PDOException $mig_err) {
+        echo "Gallery migration note: " . $mig_err->getMessage() . "\n";
+    }
+
+    // Reservations Table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `reservations` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `fullname` VARCHAR(100) NOT NULL,
+        `email` VARCHAR(100) NOT NULL,
+        `phone` VARCHAR(50) NOT NULL,
+        `org` VARCHAR(100) NULL,
+        `ticket_type` VARCHAR(100) NOT NULL,
+        `amount` VARCHAR(50) NOT NULL,
+        `payment_method` VARCHAR(50) NULL,
+        `payment_status` VARCHAR(50) DEFAULT 'Pending',
+        `payment_reference` VARCHAR(100) UNIQUE NULL,
+        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;");
+    echo "Table 'reservations' verified.\n";
+
+    // Sponsors Table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `sponsors` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `name` VARCHAR(100) NOT NULL,
+        `logo` VARCHAR(500) NULL,
+        `type` VARCHAR(50) DEFAULT 'Sponsor',
+        `order_index` INT DEFAULT 0
+    ) ENGINE=InnoDB;");
+    echo "Table 'sponsors' verified.\n";
+
+    // Blog Posts Table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `blog_posts` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `title` VARCHAR(255) NOT NULL,
+        `excerpt` VARCHAR(500) NOT NULL,
+        `content` TEXT NOT NULL,
+        `category` VARCHAR(50) NOT NULL,
+        `image` VARCHAR(500) NULL,
+        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;");
+    echo "Table 'blog_posts' verified.\n";
+
     // 4b. Add image column to hotels, awards, tickets if not exists
     $pdo->exec("ALTER TABLE `hotels` ADD COLUMN IF NOT EXISTS `image` VARCHAR(500) NULL");
     $pdo->exec("ALTER TABLE `awards` ADD COLUMN IF NOT EXISTS `image` VARCHAR(500) NULL");
+    $pdo->exec("ALTER TABLE `awards` ADD COLUMN IF NOT EXISTS `year` INT DEFAULT 2026");
     $pdo->exec("ALTER TABLE `tickets` ADD COLUMN IF NOT EXISTS `image` VARCHAR(500) NULL");
-    echo "Image columns verified on hotels, awards, tickets.\n";
+    $pdo->exec("ALTER TABLE `tickets` ADD COLUMN IF NOT EXISTS `is_international` INT DEFAULT 0");
+    echo "Image and international columns verified on hotels, awards, tickets.\n";
 
     // 5. Seed Tables (Only if empty)
     
@@ -108,7 +214,18 @@ try {
             'paystack_secret_key' => '',
             'cloudinary_cloud_name' => '',
             'cloudinary_api_key' => '',
-            'cloudinary_api_secret' => ''
+            'cloudinary_api_secret' => '',
+            'bank_name' => 'Zenith Bank',
+            'bank_account_number' => '1017482811',
+            'bank_account_name' => 'Hotel Managers Conference',
+            'smtp_enabled' => '0',
+            'smtp_host' => 'smtp.gmail.com',
+            'smtp_port' => '465',
+            'smtp_secure' => 'ssl',
+            'smtp_username' => '',
+            'smtp_password' => '',
+            'smtp_from_email' => 'reservations@hotelmanagersconference.com',
+            'smtp_from_name' => 'Hotel Managers Conference Africa'
         ];
         
         $insert_setting = $pdo->prepare("INSERT INTO `settings` (`name`, `value`) VALUES (?, ?)");
@@ -116,6 +233,30 @@ try {
             $insert_setting->execute([$name, $value]);
         }
         echo "Settings seeded successfully.\n";
+    } else {
+        // Ensure new settings are seeded even if settings were already initialized
+        $bank_check = $pdo->query("SELECT COUNT(*) FROM `settings` WHERE `name` = 'bank_name'")->fetchColumn();
+        if ($bank_check == 0) {
+            $insert_setting = $pdo->prepare("INSERT INTO `settings` (`name`, `value`) VALUES (?, ?)");
+            $insert_setting->execute(['bank_name', 'Zenith Bank']);
+            $insert_setting->execute(['bank_account_number', '1017482811']);
+            $insert_setting->execute(['bank_account_name', 'Hotel Managers Conference']);
+            echo "Bank settings appended to settings table.\n";
+        }
+        
+        $smtp_check = $pdo->query("SELECT COUNT(*) FROM `settings` WHERE `name` = 'smtp_enabled'")->fetchColumn();
+        if ($smtp_check == 0) {
+            $insert_setting = $pdo->prepare("INSERT INTO `settings` (`name`, `value`) VALUES (?, ?)");
+            $insert_setting->execute(['smtp_enabled', '0']);
+            $insert_setting->execute(['smtp_host', 'smtp.gmail.com']);
+            $insert_setting->execute(['smtp_port', '465']);
+            $insert_setting->execute(['smtp_secure', 'ssl']);
+            $insert_setting->execute(['smtp_username', '']);
+            $insert_setting->execute(['smtp_password', '']);
+            $insert_setting->execute(['smtp_from_email', 'reservations@hotelmanagersconference.com']);
+            $insert_setting->execute(['smtp_from_name', 'Hotel Managers Conference Africa']);
+            echo "SMTP settings appended to settings table.\n";
+        }
     }
 
     // Seed Speakers
@@ -161,7 +302,7 @@ try {
                 'address' => '52a Kofo Abayomi St, Victoria Island, Lagos',
                 'amenities' => 'Five Restaurants & Bars, High-speed Guest WiFi, Outdoor Infinity Pool, 24/7 Security & Concierge',
                 'price' => '$290 / night',
-                'discount_code' => 'HMC2026-CONF',
+                'website_url' => 'https://www.lagoscontinental.com',
                 'type' => 'Venue'
             ],
             [
@@ -170,7 +311,7 @@ try {
                 'address' => 'Plot 22 A/B-27 Core Area, DBS Road, GRA, Asaba',
                 'amenities' => 'Daily Shuttle to Venue, Complimentary Breakfast, Modern Fitness Center, 24-Hour Business Bureau',
                 'price' => '$180 / night',
-                'discount_code' => 'HMC2026-BWPLUS',
+                'website_url' => 'https://www.bestwestern.com',
                 'type' => 'Accredited'
             ],
             [
@@ -179,12 +320,12 @@ try {
                 'address' => 'Ikegun, Ibeju-Lekki Area, Off Lekki/Epe Expressway, Lagos',
                 'amenities' => 'Secure Gate Operations, 24/7 Power Support, Standard Guest WiFi, On-Premise Dining',
                 'price' => 'from $90 / night',
-                'discount_code' => 'HMC2026-BUDGET',
+                'website_url' => 'https://www.lacampagnetropicana.com',
                 'type' => 'Budget'
             ]
         ];
 
-        $insert_hotel = $pdo->prepare("INSERT INTO `hotels` (`name`, `description`, `address`, `amenities`, `price`, `discount_code`, `type`) VALUES (:name, :description, :address, :amenities, :price, :discount_code, :type)");
+        $insert_hotel = $pdo->prepare("INSERT INTO `hotels` (`name`, `description`, `address`, `amenities`, `price`, `website_url`, `type`) VALUES (:name, :description, :address, :amenities, :price, :website_url, :type)");
         foreach ($default_hotels as $hotel) {
             $insert_hotel->execute($hotel);
         }
@@ -244,7 +385,8 @@ try {
                 'price_ngn' => '₦60,000',
                 'price_usd' => '$40',
                 'features' => "HD Live Broadcast Access\nFull Session Slides PDF\nQ&A Chat Portal\nDigital CPD Certificate",
-                'type' => 'Virtual'
+                'type' => 'Virtual',
+                'is_international' => 0
             ],
             [
                 'name' => 'Regular Pass',
@@ -252,7 +394,8 @@ try {
                 'price_ngn' => '₦150,000',
                 'price_usd' => '$100',
                 'features' => "Full Physical Venue Entry\nMasterclass Workshops\nExhibition Hall Access\nNetworking Cocktail Lunch",
-                'type' => 'Regular'
+                'type' => 'Regular',
+                'is_international' => 0
             ],
             [
                 'name' => 'Combo Package',
@@ -260,11 +403,12 @@ try {
                 'price_ngn' => 'from $472',
                 'price_usd' => 'from $472',
                 'features' => "Standard Room (2 nights)\nAirport Coordination\nVisa Invitation Support\nFull Conference Pass",
-                'type' => 'Combo'
+                'type' => 'Combo',
+                'is_international' => 1
             ]
         ];
 
-        $insert_ticket = $pdo->prepare("INSERT INTO `tickets` (`name`, `description`, `price_ngn`, `price_usd`, `features`, `type`) VALUES (:name, :description, :price_ngn, :price_usd, :features, :type)");
+        $insert_ticket = $pdo->prepare("INSERT INTO `tickets` (`name`, `description`, `price_ngn`, `price_usd`, `features`, `type`, `is_international`) VALUES (:name, :description, :price_ngn, :price_usd, :features, :type, :is_international)");
         foreach ($default_tickets as $ticket) {
             $insert_ticket->execute($ticket);
         }
@@ -277,47 +421,82 @@ try {
         $default_gallery = [
             [
                 'category' => 'awards',
-                'title' => 'Gala Dinner Celebrations',
-                'description' => 'Presenting trophies to hotel managers of the year.',
+                'year' => 2026,
                 'image_path' => ''
             ],
             [
                 'category' => 'panels',
-                'title' => 'Hospitality Outlook 2026',
-                'description' => 'Panelists discussing expansion frameworks inside West Africa.',
+                'year' => 2026,
                 'image_path' => ''
             ],
             [
                 'category' => 'exhibits',
-                'title' => 'Vendor Showcases',
-                'description' => 'PMS developers demoing cloud platforms to general managers.',
+                'year' => 2026,
                 'image_path' => ''
             ],
             [
-                'category' => 'cocktails',
-                'title' => 'Networking Terrace Reception',
-                'description' => 'Delegates exchanging business contacts and alignment leads.',
-                'image_path' => ''
-            ],
-            [
-                'category' => 'panels',
-                'title' => 'Talent Masterclass',
-                'description' => 'LBS facilitators hosting interactive operational strategy workshops.',
-                'image_path' => ''
-            ],
-            [
-                'category' => 'exhibits',
-                'title' => 'Supply Chain Display',
-                'description' => 'F&B and equipment manufacturers showing local sourcing assets.',
+                'category' => 'general',
+                'year' => 2026,
                 'image_path' => ''
             ]
         ];
 
-        $insert_gallery = $pdo->prepare("INSERT INTO `gallery` (`category`, `title`, `description`, `image_path`) VALUES (:category, :title, :description, :image_path)");
+        $insert_gallery = $pdo->prepare("INSERT INTO `gallery` (`category`, `year`, `image_path`) VALUES (:category, :year, :image_path)");
         foreach ($default_gallery as $item) {
             $insert_gallery->execute($item);
         }
         echo "Gallery seeded successfully.\n";
+    }
+
+    // Seed Sponsors
+    $stmt = $pdo->query("SELECT COUNT(*) FROM `sponsors`");
+    if ($stmt->fetchColumn() == 0) {
+        $default_sponsors = [
+            ['name' => 'Lagos Continental', 'logo' => '', 'type' => 'Headline', 'order_index' => 0],
+            ['name' => 'OPay', 'logo' => '', 'type' => 'Sponsor', 'order_index' => 1],
+            ['name' => 'Huawei', 'logo' => '', 'type' => 'Sponsor', 'order_index' => 2],
+            ['name' => 'IDS Next', 'logo' => '', 'type' => 'Sponsor', 'order_index' => 3],
+            ['name' => 'Staycore', 'logo' => '', 'type' => 'Sponsor', 'order_index' => 4],
+            ['name' => 'Presken Hotels', 'logo' => '', 'type' => 'Sponsor', 'order_index' => 5],
+        ];
+        $insert_sponsor = $pdo->prepare("INSERT INTO `sponsors` (`name`, `logo`, `type`, `order_index`) VALUES (:name, :logo, :type, :order_index)");
+        foreach ($default_sponsors as $item) {
+            $insert_sponsor->execute($item);
+        }
+        echo "Sponsors seeded successfully.\n";
+    }
+
+    // Seed Blog Posts
+    $stmt = $pdo->query("SELECT COUNT(*) FROM `blog_posts`");
+    if ($stmt->fetchColumn() == 0) {
+        $default_blog_posts = [
+            [
+                'title' => 'Disruptive Revenue & PMS Technology for 2026',
+                'excerpt' => 'How African property managers are integrating cloud management tools to protect operating margins amid inflation.',
+                'content' => 'Full article content for Disruptive Revenue & PMS Technology for 2026 goes here. Hospitality tech is moving fast. Learn how West African hotels are adapting to Cloud PMS, RMS integrations, and mobile guest journeys to improve efficiency.',
+                'category' => 'Operations',
+                'image' => ''
+            ],
+            [
+                'title' => 'Developing 5-Star Hospitality Talent locally',
+                'excerpt' => 'Key training principles and retention programs designed to decrease staff turnover rates inside regional cities.',
+                'content' => 'Full article content for Developing 5-Star Hospitality Talent locally. Workforce stability is critical. Explore training initiatives and employer branding that decreases staff churn in African hotels.',
+                'category' => 'HR & Leadership',
+                'image' => ''
+            ],
+            [
+                'title' => 'Reducing Operating Overheads: Energy efficiency',
+                'excerpt' => 'Practical guide for properties transitioning to smart solar grids and reducing dependency on local generators.',
+                'content' => 'Full article content for Reducing Operating Overheads: Energy efficiency. Clean energy transition is no longer optional. Smart solar storage and load shedding technology allow properties to stabilize operational cost structures.',
+                'category' => 'Sustainability',
+                'image' => ''
+            ]
+        ];
+        $insert_post = $pdo->prepare("INSERT INTO `blog_posts` (`title`, `excerpt`, `content`, `category`, `image`) VALUES (:title, :excerpt, :content, :category, :image)");
+        foreach ($default_blog_posts as $post) {
+            $insert_post->execute($post);
+        }
+        echo "Blog posts seeded successfully.\n";
     }
 
     echo "Database setup completed successfully!\n";

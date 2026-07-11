@@ -5,7 +5,7 @@ require_once 'header.php';
 $gallery_list = [];
 if ($pdo) {
     try {
-        $gallery_list = $pdo->query("SELECT * FROM `gallery` ORDER BY `id` ASC")->fetchAll();
+        $gallery_list = $pdo->query("SELECT * FROM `gallery` ORDER BY `year` DESC, `id` ASC")->fetchAll();
     } catch (PDOException $e) {
         // Silent fail
     }
@@ -32,31 +32,39 @@ if ($pdo) {
     </div>
 
     <style>
-    .gallery-filter-bar {
+    .gallery-filter-container {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
         gap: 12px;
-        margin-bottom: 40px;
+        margin-bottom: 48px;
     }
-    .filter-btn {
+    .filter-chip {
         background: var(--cream);
-        border: 1px solid var(--maroon-200);
+        border: 1.5px solid var(--maroon-200);
         color: var(--maroon-900);
-        padding: 8px 20px;
+        padding: 10px 24px;
         border-radius: 50px;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        transition: all 0.25s ease;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         text-transform: uppercase;
         letter-spacing: 0.05em;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        user-select: none;
     }
-    .filter-btn:hover,
-    .filter-btn.active {
+    .filter-chip:hover {
+        transform: translateY(-2px);
+        border-color: var(--gold-400);
+        color: var(--gold-600);
+        box-shadow: 0 4px 12px rgba(212,175,55,0.15);
+    }
+    .filter-chip.active {
         background: var(--gold-400);
         border-color: var(--gold-400);
         color: var(--maroon-950);
+        box-shadow: 0 4px 12px rgba(212,175,55,0.25);
     }
     .gallery-grid-full {
         display: grid;
@@ -74,43 +82,13 @@ if ($pdo) {
         box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         transition: transform 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
     }
-    .gallery-card-item.hidden {
-        display: none;
-        opacity: 0;
-    }
     .gallery-card-item:hover {
         transform: translateY(-6px);
         border-color: var(--gold-400);
         box-shadow: 0 12px 30px rgba(0,0,0,0.15);
     }
-    .gallery-info-overlay {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to top, rgba(28,0,3,0.95) 20%, rgba(28,0,3,0.25));
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 24px;
-        color: var(--cream);
-    }
-    .gallery-info-overlay span {
-        font-size: 10px;
-        text-transform: uppercase;
-        font-weight: 700;
-        color: var(--gold-300);
-        letter-spacing: 0.1em;
-        margin-bottom: 6px;
-    }
-    .gallery-info-overlay h4 {
-        font-family: 'Playfair Display', serif;
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
-    .gallery-info-overlay p {
-        font-size: 12px;
-        opacity: 0.8;
-        line-height: 1.5;
+    .gallery-card-item:hover .gallery-img {
+        transform: scale(1.05);
     }
     @media (max-width: 1024px) {
         .gallery-grid-full {
@@ -124,43 +102,67 @@ if ($pdo) {
     }
     </style>
 
-    <!-- FILTER BAR -->
-    <div class="gallery-filter-bar">
-        <button class="filter-btn active" data-filter="all">All Photos</button>
-        <button class="filter-btn" data-filter="panels">Keynotes &amp; Panels</button>
-        <button class="filter-btn" data-filter="exhibits">Exhibitions</button>
-        <button class="filter-btn" data-filter="cocktails">Networking &amp; Cocktails</button>
-        <button class="filter-btn" data-filter="awards">Awards Ceremony</button>
+    <?php
+    $grouped_gallery = [];
+    foreach ($gallery_list as $item) {
+        $yr = isset($item['year']) ? intval($item['year']) : 2026;
+        $cat = (!empty($item['category'])) ? strtolower($item['category']) : 'general';
+        $grouped_gallery[$yr][$cat][] = $item;
+    }
+    // Sort years descending
+    krsort($grouped_gallery);
+    ?>
+
+    <!-- FILTER BAR CHIPS -->
+    <div class="gallery-filter-container">
+        <button class="filter-chip active" data-filter="all">All Categories</button>
+        <button class="filter-chip" data-filter="general">General Highlights</button>
+        <button class="filter-chip" data-filter="panels">Keynotes &amp; Panels</button>
+        <button class="filter-chip" data-filter="exhibits">Exhibitions</button>
+        <button class="filter-chip" data-filter="cocktails">Networking &amp; Cocktails</button>
+        <button class="filter-chip" data-filter="awards">Awards Ceremony</button>
     </div>
 
-    <!-- GALLERY GRID -->
-    <div class="gallery-grid-full" id="galleryGrid">
-        <?php if (empty($gallery_list)): ?>
-            <p style="grid-column: 1/-1; text-align: center; color: var(--gold-600); font-weight: 600;">No gallery items configured.</p>
-        <?php else: ?>
-            <?php foreach ($gallery_list as $item): ?>
-                <?php 
-                    $bg_style = '';
-                    if (!empty($item['image_path'])) {
-                        $bg_style = 'style="background-image: url(\'' . htmlspecialchars($item['image_path']) . '\'); background-size: cover; background-position: center;"';
-                    }
-                    
-                    $cat_display = ucfirst($item['category']);
-                    if (strtolower($item['category']) === 'panels') $cat_display = 'Keynotes';
-                    elseif (strtolower($item['category']) === 'exhibits') $cat_display = 'Exhibition';
-                    elseif (strtolower($item['category']) === 'cocktails') $cat_display = 'Networking';
-                    elseif (strtolower($item['category']) === 'awards') $cat_display = 'Awards Gala';
-                ?>
-                <div class="gallery-card-item" data-category="<?php echo htmlspecialchars($item['category']); ?>" <?php echo $bg_style; ?>>
-                    <div class="gallery-info-overlay" style="background: linear-gradient(to top, rgba(28,0,3,0.95) 20%, rgba(28,0,3,0.15) 100%);">
-                        <span><?php echo htmlspecialchars($cat_display); ?></span>
-                        <h4><?php echo htmlspecialchars($item['title']); ?></h4>
-                        <p><?php echo htmlspecialchars($item['description']); ?></p>
+    <?php if (empty($grouped_gallery)): ?>
+        <p style="text-align: center; color: var(--gold-600); font-weight: 600;">No gallery items configured.</p>
+    <?php else: ?>
+        <?php foreach ($grouped_gallery as $year => $categories): ?>
+            <div class="gallery-year-section" style="margin-bottom: 64px;">
+                <h3 class="font-display" style="font-size: 28px; color: var(--maroon-900); border-bottom: 2.5px solid var(--gold-400); padding-bottom: 8px; margin-bottom: 32px;">
+                    Event Year: <?php echo htmlspecialchars($year); ?>
+                </h3>
+                
+                <?php foreach ($categories as $cat => $items): ?>
+                    <?php 
+                        $cat_display = ucfirst($cat);
+                        if ($cat === 'panels') $cat_display = 'Keynotes & Panels';
+                        elseif ($cat === 'exhibits') $cat_display = 'Exhibitions';
+                        elseif ($cat === 'cocktails') $cat_display = 'Networking & Cocktails';
+                        elseif ($cat === 'awards') $cat_display = 'Awards Ceremony';
+                        elseif ($cat === 'general') $cat_display = 'General Highlights';
+                    ?>
+                    <div class="gallery-category-section" data-category="<?php echo htmlspecialchars($cat); ?>" style="margin-bottom: 48px;">
+                        <h4 class="font-display" style="font-size: 20px; color: var(--maroon-800); margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: var(--gold-500);">✦</span>
+                            <?php echo htmlspecialchars($cat_display); ?>
+                        </h4>
+                        
+                        <div class="gallery-grid-full" style="margin-bottom: 24px;">
+                            <?php foreach ($items as $item): ?>
+                                <div class="gallery-card-item">
+                                    <?php if (!empty($item['image_path'])): ?>
+                                        <img src="<?php echo htmlspecialchars($item['image_path']); ?>" alt="Gallery Image" style="width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s ease;" class="gallery-img">
+                                    <?php else: ?>
+                                        <div style="font-size: 40px; color: var(--gold-300); display:flex; align-items:center; justify-content:center; height:100%;">📷</div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
 </div>
 </section>
 
@@ -176,25 +178,37 @@ if ($pdo) {
 </section>
 
 <script>
-// Filter gallery items dynamically
 document.addEventListener('DOMContentLoaded', function() {
-    var filterButtons = document.querySelectorAll('.filter-btn');
-    var galleryCards = document.querySelectorAll('.gallery-card-item');
+    var chips = document.querySelectorAll('.filter-chip');
+    var yearSections = document.querySelectorAll('.gallery-year-section');
 
-    filterButtons.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            // Toggle active classes on buttons
-            filterButtons.forEach(function(b) { b.classList.remove('active'); });
-            btn.classList.add('active');
+    chips.forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            // Toggle active chips
+            chips.forEach(function(c) { c.classList.remove('active'); });
+            chip.classList.add('active');
 
-            var filterValue = btn.getAttribute('data-filter');
+            var filterValue = chip.getAttribute('data-filter');
 
-            galleryCards.forEach(function(card) {
-                var category = card.getAttribute('data-category');
-                if (filterValue === 'all' || category === filterValue) {
-                    card.classList.remove('hidden');
+            yearSections.forEach(function(yearSec) {
+                var catSections = yearSec.querySelectorAll('.gallery-category-section');
+                var visibleCatsCount = 0;
+
+                catSections.forEach(function(catSec) {
+                    var category = catSec.getAttribute('data-category');
+                    if (filterValue === 'all' || category === filterValue) {
+                        catSec.style.display = 'block';
+                        visibleCatsCount++;
+                    } else {
+                        catSec.style.display = 'none';
+                    }
+                });
+
+                // Hide the whole year section if it contains no matching category photos
+                if (visibleCatsCount > 0) {
+                    yearSec.style.display = 'block';
                 } else {
-                    card.classList.add('hidden');
+                    yearSec.style.display = 'none';
                 }
             });
         });

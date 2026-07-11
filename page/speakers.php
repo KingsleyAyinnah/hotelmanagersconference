@@ -5,7 +5,7 @@ require_once 'header.php';
 $speakers_list = [];
 if ($pdo) {
     try {
-        $speakers_list = $pdo->query("SELECT * FROM `speakers` ORDER BY `id` ASC")->fetchAll();
+        $speakers_list = $pdo->query("SELECT * FROM `speakers` ORDER BY CASE WHEN LOWER(`category`) = 'keynote speaker' THEN 0 ELSE 1 END ASC, `id` ASC")->fetchAll();
     } catch (PDOException $e) {
         // Silent fail
     }
@@ -57,6 +57,27 @@ if ($pdo) {
         aspect-ratio: 1.1;
         overflow: hidden;
         position: relative;
+    }
+    .speaker-badge {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        background: var(--gold-400);
+        color: var(--maroon-950);
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        z-index: 10;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: 1px solid var(--gold-200);
+    }
+    .speaker-badge.regular-speaker {
+        background: var(--maroon-900);
+        color: var(--cream);
+        border-color: rgba(255,255,255,0.15);
     }
     .speaker-page-img {
         width: 100%;
@@ -133,6 +154,11 @@ if ($pdo) {
             <?php foreach ($speakers_list as $s): ?>
                 <div class="speaker-page-card">
                     <div class="speaker-page-img-wrapper">
+                        <?php 
+                            $cat = isset($s['category']) ? $s['category'] : 'Speaker';
+                            $badge_class = (strtolower($cat) === 'keynote speaker') ? '' : 'regular-speaker';
+                        ?>
+                        <span class="speaker-badge <?php echo $badge_class; ?>"><?php echo htmlspecialchars($cat); ?></span>
                         <?php if (!empty($s['image'])): ?>
                             <img src="<?php echo htmlspecialchars($s['image']); ?>" alt="<?php echo htmlspecialchars($s['name']); ?>" class="speaker-page-img" loading="lazy"/>
                         <?php else: ?>

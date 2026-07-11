@@ -13,21 +13,22 @@ $error_message = '';
 // Handle CRUD Operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['save_speaker'])) {
-        $name  = trim($_POST['name']);
-        $title = trim($_POST['title']);
-        $image = trim($_POST['image']); // Cloudinary URL from hidden input
+        $name     = trim($_POST['name']);
+        $title    = trim($_POST['title']);
+        $category = trim($_POST['category']);
+        $image    = trim($_POST['image']); // Cloudinary URL from hidden input
 
-        if (empty($name) || empty($title)) {
-            $error_message = 'Name and Professional Title are required fields.';
+        if (empty($name) || empty($title) || empty($category)) {
+            $error_message = 'Name, Professional Title, and Speaker Category are required fields.';
         } else {
             try {
                 if ($id > 0) {
-                    $stmt = $pdo->prepare("UPDATE `speakers` SET `name` = :name, `title` = :title, `image` = :image WHERE `id` = :id");
-                    $stmt->execute(['name' => $name, 'title' => $title, 'image' => $image, 'id' => $id]);
+                    $stmt = $pdo->prepare("UPDATE `speakers` SET `name` = :name, `title` = :title, `image` = :image, `category` = :category WHERE `id` = :id");
+                    $stmt->execute(['name' => $name, 'title' => $title, 'image' => $image, 'category' => $category, 'id' => $id]);
                     $success_message = 'Speaker details updated successfully.';
                 } else {
-                    $stmt = $pdo->prepare("INSERT INTO `speakers` (`name`, `title`, `image`) VALUES (:name, :title, :image)");
-                    $stmt->execute(['name' => $name, 'title' => $title, 'image' => $image]);
+                    $stmt = $pdo->prepare("INSERT INTO `speakers` (`name`, `title`, `image`, `category`) VALUES (:name, :title, :image, :category)");
+                    $stmt->execute(['name' => $name, 'title' => $title, 'image' => $image, 'category' => $category]);
                     $success_message = 'New speaker added successfully.';
                 }
                 $action = 'list';
@@ -107,6 +108,7 @@ if ($action === 'list') {
                         <tr>
                             <th style="width: 70px;">Photo</th>
                             <th>Name</th>
+                            <th>Category</th>
                             <th>Professional Title</th>
                             <th style="width: 160px; text-align: right;">Actions</th>
                         </tr>
@@ -123,6 +125,17 @@ if ($action === 'list') {
                                 </td>
                                 <td style="font-weight: 600; color: var(--maroon-900);">
                                     <?php echo htmlspecialchars($s['name']); ?>
+                                </td>
+                                <td>
+                                    <?php
+                                    $badge_class = 'badge-budget';
+                                    if (isset($s['category']) && strtolower($s['category']) === 'keynote speaker') {
+                                        $badge_class = 'badge-accredited';
+                                    }
+                                    ?>
+                                    <span class="badge <?php echo $badge_class; ?>">
+                                        <?php echo htmlspecialchars(isset($s['category']) ? $s['category'] : 'Speaker'); ?>
+                                    </span>
                                 </td>
                                 <td>
                                     <?php echo htmlspecialchars($s['title']); ?>
@@ -149,9 +162,19 @@ if ($action === 'list') {
         <form action="speakers.php<?php echo ($action === 'edit') ? '?id=' . $id : ''; ?>" method="POST">
             <input type="hidden" name="save_speaker" value="1">
 
-            <div class="form-group">
-                <label class="form-label" for="name">Speaker Full Name</label>
-                <input type="text" id="name" name="name" class="form-input" required value="<?php echo ($speaker) ? htmlspecialchars($speaker['name']) : ''; ?>" placeholder="e.g. Prof Wasiu Babalola">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="name">Speaker Full Name</label>
+                    <input type="text" id="name" name="name" class="form-input" required value="<?php echo ($speaker) ? htmlspecialchars($speaker['name']) : ''; ?>" placeholder="e.g. Prof Wasiu Babalola">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="category">Speaker Category</label>
+                    <select id="category" name="category" class="form-select" required>
+                        <option value="Speaker" <?php echo ($speaker && $speaker['category'] === 'Speaker') ? 'selected' : ''; ?>>Speaker</option>
+                        <option value="Keynote Speaker" <?php echo ($speaker && $speaker['category'] === 'Keynote Speaker') ? 'selected' : ''; ?>>Keynote Speaker</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">

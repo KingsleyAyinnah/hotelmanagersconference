@@ -13,44 +13,44 @@ $error_message = '';
 // Handle CRUD Operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['save_hotel'])) {
-        $name          = trim($_POST['name']);
-        $description   = trim($_POST['description']);
-        $address       = trim($_POST['address']);
-        $amenities     = trim($_POST['amenities']);
-        $price         = trim($_POST['price']);
-        $discount_code = trim($_POST['discount_code']);
-        $type          = trim($_POST['type']);
-        $image         = trim($_POST['image']); // Cloudinary URL
+        $name        = trim($_POST['name']);
+        $description = trim($_POST['description']);
+        $address     = trim($_POST['address']);
+        $amenities   = trim($_POST['amenities']);
+        $price       = trim($_POST['price']);
+        $website_url = trim($_POST['website_url']);
+        $type        = trim($_POST['type']);
+        $image       = trim($_POST['image']); // Cloudinary URL
 
-        if (empty($name) || empty($description) || empty($address)) {
-            $error_message = 'Hotel Name, Description, and Address are required fields.';
+        if (empty($name) || empty($address)) {
+            $error_message = 'Hotel Name and Address are required fields.';
         } else {
             try {
                 if ($id > 0) {
-                    $stmt = $pdo->prepare("UPDATE `hotels` SET `name` = :name, `description` = :description, `address` = :address, `amenities` = :amenities, `price` = :price, `discount_code` = :discount_code, `type` = :type, `image` = :image WHERE `id` = :id");
+                    $stmt = $pdo->prepare("UPDATE `hotels` SET `name` = :name, `description` = :description, `address` = :address, `amenities` = :amenities, `price` = :price, `website_url` = :website_url, `type` = :type, `image` = :image WHERE `id` = :id");
                     $stmt->execute([
-                        'name'          => $name,
-                        'description'   => $description,
-                        'address'       => $address,
-                        'amenities'     => $amenities,
-                        'price'         => $price,
-                        'discount_code' => $discount_code,
-                        'type'          => $type,
-                        'image'         => $image,
-                        'id'            => $id
+                        'name'        => $name,
+                        'description' => $description,
+                        'address'     => $address,
+                        'amenities'   => $amenities,
+                        'price'       => $price,
+                        'website_url' => $website_url,
+                        'type'        => $type,
+                        'image'       => $image,
+                        'id'          => $id
                     ]);
                     $success_message = 'Hotel details updated successfully.';
                 } else {
-                    $stmt = $pdo->prepare("INSERT INTO `hotels` (`name`, `description`, `address`, `amenities`, `price`, `discount_code`, `type`, `image`) VALUES (:name, :description, :address, :amenities, :price, :discount_code, :type, :image)");
+                    $stmt = $pdo->prepare("INSERT INTO `hotels` (`name`, `description`, `address`, `amenities`, `price`, `website_url`, `type`, `image`) VALUES (:name, :description, :address, :amenities, :price, :website_url, :type, :image)");
                     $stmt->execute([
-                        'name'          => $name,
-                        'description'   => $description,
-                        'address'       => $address,
-                        'amenities'     => $amenities,
-                        'price'         => $price,
-                        'discount_code' => $discount_code,
-                        'type'          => $type,
-                        'image'         => $image
+                        'name'        => $name,
+                        'description' => $description,
+                        'address'     => $address,
+                        'amenities'   => $amenities,
+                        'price'       => $price,
+                        'website_url' => $website_url,
+                        'type'        => $type,
+                        'image'       => $image
                     ]);
                     $success_message = 'New partner hotel added successfully.';
                 }
@@ -133,7 +133,7 @@ if ($action === 'list') {
                             <th>Name</th>
                             <th>Category</th>
                             <th>Price / Night</th>
-                            <th>Promo Code</th>
+                            <th>Website URL</th>
                             <th style="width: 160px; text-align: right;">Actions</th>
                         </tr>
                     </thead>
@@ -164,7 +164,11 @@ if ($action === 'list') {
                                     <?php echo htmlspecialchars($h['price']); ?>
                                 </td>
                                 <td>
-                                    <code><?php echo htmlspecialchars($h['discount_code']); ?></code>
+                                    <?php if (!empty($h['website_url'])): ?>
+                                        <a href="<?php echo htmlspecialchars($h['website_url']); ?>" target="_blank" style="color: var(--maroon-800); text-decoration: underline; font-size: 12px; font-weight: 500;">Visit Site ↗</a>
+                                    <?php else: ?>
+                                        <span style="color: #94a3b8; font-size: 12px;">None</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td style="text-align: right;">
                                     <a href="hotels.php?action=edit&id=<?php echo $h['id']; ?>" class="btn btn-gold btn-sm">Edit</a>
@@ -205,8 +209,8 @@ if ($action === 'list') {
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="description">Short Marketing Bio / Pitch</label>
-                <textarea id="description" name="description" class="form-textarea" required placeholder="Describe proximity to venue, transfers support, catering quality, etc..."><?php echo ($hotel) ? htmlspecialchars($hotel['description']) : ''; ?></textarea>
+                <label class="form-label" for="description">Short Marketing Bio / Pitch (Optional)</label>
+                <textarea id="description" name="description" class="form-textarea" placeholder="Describe proximity to venue, transfers support, catering quality, etc..."><?php echo ($hotel) ? htmlspecialchars($hotel['description']) : ''; ?></textarea>
             </div>
 
             <div class="form-group">
@@ -227,8 +231,8 @@ if ($action === 'list') {
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="discount_code">Delegate Promo Code</label>
-                    <input type="text" id="discount_code" name="discount_code" class="form-input" value="<?php echo ($hotel) ? htmlspecialchars($hotel['discount_code']) : ''; ?>" placeholder="e.g. HMC2026-CONF">
+                    <label class="form-label" for="website_url">Hotel Website URL</label>
+                    <input type="url" id="website_url" name="website_url" class="form-input" value="<?php echo ($hotel) ? htmlspecialchars($hotel['website_url']) : ''; ?>" placeholder="e.g. https://www.lagoscontinental.com">
                 </div>
             </div>
 

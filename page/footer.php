@@ -4,7 +4,7 @@
 <div class="footer-grid">
 <div>
 <div class="footer-brand">
-<img src="https://hotelmanagersconference.com/landingpage/images/hmc_logo.png" alt="HMC Africa" style="height: 40px;">
+<img src="<?php echo htmlspecialchars($project_base); ?>images/logo.png" alt="HMC Africa" style="height: 40px;">
 </div>
 <p class="footer-desc"><?php echo htmlspecialchars($footer_description); ?></p>
 </div>
@@ -44,6 +44,13 @@
 </div>
 </div>
 
+<!-- STICKY CTA FOOTER -->
+<div class="sticky-cta-footer" id="stickyCTAFooter" style="display:none">
+<div class="sticky-cta-footer-inner">
+© 2026 All rights reserved. Built and Powered by <a href="https://www.dreem.com.ng/" target="_blank" class="sticky-cta-footer-link">DreemTec</a>.
+</div>
+</div>
+
 <script>
 // COUNTDOWN
 function updateCountdown(){
@@ -71,9 +78,12 @@ if (document.getElementById('cd-days') || document.getElementById('cd2-days')) {
 
 // STICKY CTA
 var sticky=document.getElementById('stickyCTA');
-if (sticky) {
+var stickyFooter=document.getElementById('stickyCTAFooter');
+if (sticky && stickyFooter) {
     window.addEventListener('scroll',function(){
-    sticky.style.display=window.scrollY>600?'flex':'none';
+    var showSticky=window.scrollY>600;
+    sticky.style.display=showSticky?'flex':'none';
+    stickyFooter.style.display=showSticky?'flex':'none';
     },{passive:true});
 }
 

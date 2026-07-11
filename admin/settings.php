@@ -8,6 +8,17 @@ $error_message = '';
 
 // Handle Settings Update
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Fetch old settings map to get previous smtp_password if none was submitted
+    $settings_map = [];
+    if ($pdo) {
+        try {
+            $stmt = $pdo->query("SELECT * FROM `settings`");
+            $settings_map = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+        } catch (PDOException $e) {
+            // ignore
+        }
+    }
+
     $updated_settings = [
         'phone_display' => isset($_POST['phone_display']) ? trim($_POST['phone_display']) : '',
         'phone_link' => isset($_POST['phone_link']) ? trim($_POST['phone_link']) : '',
@@ -22,13 +33,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'footer_address' => isset($_POST['footer_address']) ? trim($_POST['footer_address']) : '',
         'cloudinary_cloud_name' => isset($_POST['cloudinary_cloud_name']) ? trim($_POST['cloudinary_cloud_name']) : '',
         'cloudinary_api_key' => isset($_POST['cloudinary_api_key']) ? trim($_POST['cloudinary_api_key']) : '',
-        'cloudinary_api_secret' => isset($_POST['cloudinary_api_secret']) ? trim($_POST['cloudinary_api_secret']) : ''
+        'cloudinary_api_secret' => isset($_POST['cloudinary_api_secret']) ? trim($_POST['cloudinary_api_secret']) : '',
+        'smtp_enabled' => isset($_POST['smtp_enabled']) ? trim($_POST['smtp_enabled']) : '0',
+        'smtp_host' => isset($_POST['smtp_host']) ? trim($_POST['smtp_host']) : '',
+        'smtp_port' => isset($_POST['smtp_port']) ? trim($_POST['smtp_port']) : '25',
+        'smtp_secure' => isset($_POST['smtp_secure']) ? trim($_POST['smtp_secure']) : 'none',
+        'smtp_username' => isset($_POST['smtp_username']) ? trim($_POST['smtp_username']) : '',
+        'smtp_from_email' => isset($_POST['smtp_from_email']) ? trim($_POST['smtp_from_email']) : '',
+        'smtp_from_name' => isset($_POST['smtp_from_name']) ? trim($_POST['smtp_from_name']) : ''
     ];
+
+    if (isset($_POST['smtp_password']) && $_POST['smtp_password'] !== '') {
+        $updated_settings['smtp_password'] = trim($_POST['smtp_password']);
+    } else {
+        $updated_settings['smtp_password'] = isset($settings_map['smtp_password']) ? $settings_map['smtp_password'] : '';
+    }
 
     if ($pdo) {
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare("UPDATE `settings` SET `value` = :value WHERE `name` = :name");
+            $stmt = $pdo->prepare("INSERT INTO `settings` (`name`, `value`) VALUES (:name, :value) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)");
             foreach ($updated_settings as $name => $value) {
                 $stmt->execute(['value' => $value, 'name' => $name]);
             }
@@ -47,6 +71,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $header_urgency = $updated_settings['header_urgency'];
             $footer_description = $updated_settings['footer_description'];
             $footer_address = $updated_settings['footer_address'];
+
+            // Handle test email action
+            if (isset($_POST['test_smtp'])) {
+                $recipient = isset($_POST['smtp_test_recipient']) ? trim($_POST['smtp_test_recipient']) : '';
+                if (!empty($recipient)) {
+                    $test_result = SmtpMailer::rawSend(
+                        $updated_settings['smtp_host'],
+                        (int)$updated_settings['smtp_port'],
+                        $updated_settings['smtp_username'],
+                        $updated_settings['smtp_password'],
+                        $updated_settings['smtp_secure'],
+                        $updated_settings['smtp_from_email'],
+                        $updated_settings['smtp_from_name'],
+                        $recipient,
+                        "SMTP Connection Test - HMC Africa",
+                        "<h3>SMTP Connection Test Successful!</h3><p>This is a test email sent from the Hotel Managers Conference Africa admin panel to verify your SMTP configuration settings.</p><p><strong>Sent at:</strong> " . date('Y-m-d H:i:s') . "</p>"
+                    );
+                    
+                    if ($test_result['success']) {
+                        $success_message .= ' & Test email sent successfully to ' . htmlspecialchars($recipient) . '!';
+                    } else {
+                        $error_message = 'Settings saved, but Test Email failed: ' . htmlspecialchars($test_result['message']);
+                    }
+                } else {
+                    $error_message = 'Settings saved, but Test Email failed: Recipient email address cannot be empty.';
+                }
+            }
         } catch (PDOException $e) {
             $pdo->rollBack();
             $error_message = 'Failed to update settings: ' . $e->getMessage();
@@ -82,6 +133,14 @@ $current_footer_address = isset($settings_map['footer_address']) ? $settings_map
 $current_cloudinary_cloud_name = isset($settings_map['cloudinary_cloud_name']) ? $settings_map['cloudinary_cloud_name'] : '';
 $current_cloudinary_api_key = isset($settings_map['cloudinary_api_key']) ? $settings_map['cloudinary_api_key'] : '';
 $current_cloudinary_api_secret = isset($settings_map['cloudinary_api_secret']) ? $settings_map['cloudinary_api_secret'] : '';
+$current_smtp_enabled = isset($settings_map['smtp_enabled']) ? $settings_map['smtp_enabled'] : '0';
+$current_smtp_host = isset($settings_map['smtp_host']) ? $settings_map['smtp_host'] : 'smtp.gmail.com';
+$current_smtp_port = isset($settings_map['smtp_port']) ? $settings_map['smtp_port'] : '465';
+$current_smtp_secure = isset($settings_map['smtp_secure']) ? $settings_map['smtp_secure'] : 'ssl';
+$current_smtp_username = isset($settings_map['smtp_username']) ? $settings_map['smtp_username'] : '';
+$current_smtp_password = isset($settings_map['smtp_password']) ? $settings_map['smtp_password'] : '';
+$current_smtp_from_email = isset($settings_map['smtp_from_email']) ? $settings_map['smtp_from_email'] : 'reservations@hotelmanagersconference.com';
+$current_smtp_from_name = isset($settings_map['smtp_from_name']) ? $settings_map['smtp_from_name'] : 'Hotel Managers Conference Africa';
 ?>
 
 <?php if ($success_message): ?>
@@ -213,6 +272,81 @@ $current_cloudinary_api_secret = isset($settings_map['cloudinary_api_secret']) ?
                 ⚠️ <strong>Cloudinary not configured.</strong> Image uploads are disabled until you set all three fields above.
             </div>
         <?php endif; ?>
+    </div>
+
+    <!-- SMTP Email Configuration Section -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">6. 📧 SMTP Email Configuration</h3>
+        </div>
+        <div style="margin-bottom: 16px; padding: 12px 16px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; font-size: 13px; color: #78350f; line-height: 1.6;">
+            <strong>Setup:</strong> Enter your outbound SMTP server details to send automatic transactional email notifications (e.g. reservation confirmations and status updates).
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group" style="flex: 1 1 100%;">
+                <label class="form-label" for="smtp_enabled">SMTP Outbound Mail Status</label>
+                <select id="smtp_enabled" name="smtp_enabled" class="form-input" style="height: 42px;">
+                    <option value="1" <?php echo $current_smtp_enabled === '1' ? 'selected' : ''; ?>>Active (Send Transactional Emails)</option>
+                    <option value="0" <?php echo $current_smtp_enabled !== '1' ? 'selected' : ''; ?>>Inactive (Do Not Send Emails)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="smtp_host">SMTP Server Hostname</label>
+                <input type="text" id="smtp_host" name="smtp_host" class="form-input" value="<?php echo htmlspecialchars($current_smtp_host); ?>" placeholder="e.g. smtp.gmail.com">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="smtp_port">SMTP Server Port</label>
+                <input type="text" id="smtp_port" name="smtp_port" class="form-input" value="<?php echo htmlspecialchars($current_smtp_port); ?>" placeholder="e.g. 465 or 587">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="smtp_secure">Connection Encryption</label>
+                <select id="smtp_secure" name="smtp_secure" class="form-input" style="height: 42px;">
+                    <option value="ssl" <?php echo $current_smtp_secure === 'ssl' ? 'selected' : ''; ?>>SSL (Port 465 / Secure SMTPS)</option>
+                    <option value="tls" <?php echo $current_smtp_secure === 'tls' ? 'selected' : ''; ?>>TLS / STARTTLS (Port 587)</option>
+                    <option value="none" <?php echo $current_smtp_secure === 'none' ? 'selected' : ''; ?>>None (Port 25 or unencrypted)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="smtp_username">SMTP Auth Username</label>
+                <input type="text" id="smtp_username" name="smtp_username" class="form-input" value="<?php echo htmlspecialchars($current_smtp_username); ?>" placeholder="e.g. smtp@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="smtp_password">SMTP Auth Password</label>
+                <input type="password" id="smtp_password" name="smtp_password" class="form-input" value="" placeholder="<?php echo !empty($current_smtp_password) ? '•••••••••••••••• (Leave blank to keep current)' : 'Enter password'; ?>">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="smtp_from_email">Sender Email Address (From)</label>
+                <input type="email" id="smtp_from_email" name="smtp_from_email" class="form-input" value="<?php echo htmlspecialchars($current_smtp_from_email); ?>" placeholder="reservations@hotelmanagersconference.com">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="smtp_from_name">Sender Name (From Name)</label>
+                <input type="text" id="smtp_from_name" name="smtp_from_name" class="form-input" value="<?php echo htmlspecialchars($current_smtp_from_name); ?>" placeholder="Hotel Managers Conference Africa">
+            </div>
+        </div>
+
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--maroon-200); display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
+            <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 250px;">
+                <label class="form-label" for="smtp_test_recipient">Test Recipient Email Address</label>
+                <input type="email" id="smtp_test_recipient" name="smtp_test_recipient" class="form-input" value="<?php echo htmlspecialchars(!empty($current_email) ? $current_email : 'reservations@hotelmanagersconference.com'); ?>" placeholder="Enter email to send test to">
+            </div>
+            <button type="submit" name="test_smtp" class="btn btn-secondary" style="height: 42px; background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; cursor: pointer; font-weight: 600;">
+                ⚡ Send Test Email
+            </button>
+        </div>
     </div>
 
     <div style="margin-bottom: 40px; display: flex; gap: 16px; flex-wrap: wrap;">

@@ -11,6 +11,7 @@ require_once '../config/config.php';
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <base href="<?php echo htmlspecialchars($project_base); ?>">
+<link rel="icon" type="image/png" href="<?php echo htmlspecialchars($project_base); ?>images/favicon.png?v=2"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -106,9 +107,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--ink);ove
 .nav-links a.active {
     color: var(--gold-300);
 }
-.nav-links a.active {
-    border-bottom: 2px solid var(--gold-400);
-}
+
 .nav-cta {
     background: var(--gold-400);
     color: var(--maroon-950);
@@ -536,6 +535,15 @@ footer{background:#0a0307;color:rgba(253,247,240,.65);padding:56px 0 24px;border
 .sticky-cta-btn-secondary{border:1px solid var(--gold-400);color:var(--gold-300);padding:10px 20px;border-radius:50px;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;transition:all .2s;white-space:nowrap}
 .sticky-cta-btn-secondary:hover{background:var(--gold-400);color:var(--maroon-950)}
 
+/* STICKY CTA FOOTER */
+.sticky-cta-footer{position:fixed;bottom:0;left:0;right:0;z-index:998;background:rgba(26,5,16,.95);padding:8px 24px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(8px)}
+.sticky-cta-footer-inner{max-width:1200px;margin:0 auto;width:100%;text-align:center;font-size:11px;color:rgba(253,247,240,.6)}
+.sticky-cta-footer-link{color:var(--gold-300);text-decoration:none;font-weight:600;transition:color .2s}
+.sticky-cta-footer-link:hover{color:var(--gold-200);text-decoration:underline}
+
+/* Adjust sticky CTA position to make room for footer */
+.sticky-cta{bottom:30px}
+
 /* RESPONSIVE */
 @media(max-width:1200px){
 .container{padding:0 20px}
@@ -640,7 +648,7 @@ footer{padding:44px 0 20px}
     <div class="container">
         <nav class="header-nav">
             <a href="./" class="nav-logo">
-                <img src="https://hotelmanagersconference.com/landingpage/images/hmc_logo.png" alt="HMC Africa" style="height: 40px;">
+                <img src="<?php echo htmlspecialchars($project_base); ?>images/logo.png" alt="HMC Africa" style="height: 40px;">
             </a>
             
             <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">

@@ -11,6 +11,7 @@ require_once '../config/config.php';
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <base href="<?php echo htmlspecialchars($project_base); ?>">
+<link rel="icon" type="image/png" href="<?php echo htmlspecialchars($project_base); ?>images/favicon.png?v=2"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -227,6 +228,8 @@ section{padding:80px 0}
 .speakers-section{background:var(--maroon-950);color:var(--cream)}
 .speaker-card{border:1px solid rgba(212,175,55,.15);border-radius:16px;overflow:hidden;background:linear-gradient(180deg,var(--maroon-900),var(--maroon-950));position:relative;transition:border-color .25s}
 .speaker-card:hover{border-color:rgba(212,175,55,.5)}
+.landing-speaker-badge{position:absolute;top:16px;left:16px;background:var(--gold-400);color:var(--maroon-950);padding:4px 10px;border-radius:50px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;z-index:10;box-shadow:0 4px 10px rgba(0,0,0,0.15);border:1px solid var(--gold-200);line-height:1}
+.landing-speaker-badge.regular-speaker{background:var(--maroon-800);color:var(--cream);border-color:rgba(255,255,255,0.15)}
 .speaker-img{width:100%;aspect-ratio:1;object-fit:cover;display:block;transition:transform .7s}
 .speaker-card:hover .speaker-img{transform:scale(1.05)}
 .speaker-info{position:absolute;inset:0;top:auto;padding:20px;background:linear-gradient(transparent,rgba(28,0,3,.95) 40%)}
@@ -376,6 +379,15 @@ footer{background:#0a0307;color:rgba(253,247,240,.65);padding:56px 0 24px;border
 .sticky-cta-btn-secondary{border:1px solid var(--gold-400);color:var(--gold-300);padding:10px 20px;border-radius:50px;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;transition:all .2s;white-space:nowrap}
 .sticky-cta-btn-secondary:hover{background:var(--gold-400);color:var(--maroon-950)}
 
+/* STICKY CTA FOOTER */
+.sticky-cta-footer{position:fixed;bottom:0;left:0;right:0;z-index:998;background:rgba(28,0,3,.95);padding:8px 24px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(8px)}
+.sticky-cta-footer-inner{max-width:1200px;margin:0 auto;width:100%;text-align:center;font-size:11px;color:rgba(253,247,240,.6)}
+.sticky-cta-footer-link{color:var(--gold-300);text-decoration:none;font-weight:600;transition:color .2s}
+.sticky-cta-footer-link:hover{color:var(--gold-200);text-decoration:underline}
+
+/* Adjust sticky CTA position to make room for footer */
+.sticky-cta{bottom:30px}
+
 /* RESPONSIVE */
 @media(max-width:1024px){
 .grid-hero{grid-template-columns:1fr;gap:40px}
@@ -441,7 +453,7 @@ section{padding:60px 0}
 <!-- NAV — Logo + Register only -->
 <nav class="hero-nav">
 <a href="./" class="nav-logo">
-<img src="https://hotelmanagersconference.com/landingpage/images/hmc_logo.png" alt="HMC Africa" style="height: 40px;">
+<img src="<?php echo htmlspecialchars($project_base); ?>images/logo.png" alt="HMC Africa" style="height: 40px;">
 </a>
 <a href="<?php echo htmlspecialchars($ticket_link); ?>" class="nav-cta">Reserve My Seat Now →</a>
 </nav>
@@ -829,15 +841,66 @@ These aren't influencers.<br>
 </h2>
 <p class="section-p dark" style="margin-bottom:0">GMs running flagship 5-stars. Academics shaping the next generation of hoteliers. Brand owners deciding the future of African hospitality. All in one room.</p>
 </div>
-<div class="grid-3">
-<div class="speaker-card"><img src="https://i0.wp.com/hotelmanagersconference.com/wp-content/uploads/2024/05/Speaker-1.png?fit=600%2C600&ssl=1" alt="Ahmed Raza" class="speaker-img" loading="lazy"/><div class="speaker-info"><h3>Ahmed Raza</h3><div class="role">General Manager</div><div class="org">Radisson Blu, Victoria Island Lagos</div></div></div>
-<div class="speaker-card"><img src="https://i0.wp.com/hotelmanagersconference.com/wp-content/uploads/2025/05/speakers-1.png?fit=600%2C600&ssl=1" alt="Dr. Belinda Nwosu" class="speaker-img" loading="lazy"/><div class="speaker-info"><h3>Dr. Belinda Nwosu, FIH</h3><div class="role">Faculty &amp; Director, LBS Hospitality Initiative</div><div class="org">Lagos Business School</div></div></div>
-<div class="speaker-card"><img src="https://i0.wp.com/hotelmanagersconference.com/wp-content/uploads/2025/05/4.png?fit=600%2C600&ssl=1" alt="Prof. Wasiu Babalola" class="speaker-img" loading="lazy"/><div class="speaker-info"><h3>Prof. Wasiu Babalola</h3><div class="role">SVP Africa, Continent Worldwide Hotels (Türkiye)</div><div class="org">Atiba University, Oyo</div></div></div>
-<div class="speaker-card"><img src="https://i0.wp.com/hotelmanagersconference.com/wp-content/uploads/2021/10/speakers-1.png?fit=600%2C600&ssl=1" alt="Karl Hala" class="speaker-img" loading="lazy"/><div class="speaker-info"><h3>Karl Hala</h3><div class="role">Group General Manager</div><div class="org">Continental Hotels, Nigeria</div></div></div>
-<div class="speaker-card"><img src="https://i0.wp.com/hotelmanagersconference.com/wp-content/uploads/2026/05/5.png?fit=600%2C600&ssl=1" alt="Barr. Chike Ogeah" class="speaker-img" loading="lazy"/><div class="speaker-info"><h3>Barr. Chike Ogeah</h3><div class="role">Managing Director / CEO</div><div class="org">Mac Folly Hospitality (Lagos Marriott)</div></div></div>
-<div class="speaker-card"><img src="https://i0.wp.com/hotelmanagersconference.com/wp-content/uploads/2025/05/JS-Signature-logo.png?fit=600%2C600&ssl=1" alt="Dr. Michael Pinder" class="speaker-img" loading="lazy"/><div class="speaker-info"><h3>Dr. Michael Pinder</h3><div class="role">General Manager</div><div class="org">JS Signature Hotel, Port Harcourt</div></div></div>
+<?php
+$landing_speakers = [];
+if ($pdo) {
+    try {
+        $landing_speakers = $pdo->query("SELECT * FROM `speakers` ORDER BY CASE WHEN LOWER(`category`) = 'keynote speaker' THEN 0 ELSE 1 END ASC, `id` ASC LIMIT 4")->fetchAll();
+    } catch (PDOException $e) {
+        // Silent fallback
+    }
+}
+?>
+<div class="grid-4">
+<?php if (!empty($landing_speakers)): ?>
+    <?php foreach ($landing_speakers as $s): ?>
+        <?php
+        $role = $s['title'];
+        $org = '';
+        if (strpos($s['title'], ',') !== false) {
+            $parts = explode(',', $s['title'], 2);
+            $role = trim($parts[0]);
+            $org = trim($parts[1]);
+        } elseif (strpos($s['title'], '-') !== false) {
+            $parts = explode('-', $s['title'], 2);
+            $role = trim($parts[0]);
+            $org = trim($parts[1]);
+        }
+        
+        $img_src = !empty($s['image']) ? htmlspecialchars($s['image']) : '';
+        ?>
+        <div class="speaker-card" style="height: 100%;">
+            <?php 
+                $cat = isset($s['category']) ? $s['category'] : 'Speaker';
+                $badge_class = (strtolower($cat) === 'keynote speaker') ? '' : 'regular-speaker';
+            ?>
+            <span class="landing-speaker-badge <?php echo $badge_class; ?>"><?php echo htmlspecialchars($cat); ?></span>
+            <?php if (!empty($img_src)): ?>
+                <img src="<?php echo $img_src; ?>" alt="<?php echo htmlspecialchars($s['name']); ?>" class="speaker-img" loading="lazy"/>
+            <?php else: ?>
+                <div style="aspect-ratio: 1; font-size: 50px; color: var(--gold-300); display:flex; align-items:center; justify-content:center; background: linear-gradient(135deg, var(--maroon-900) 0%, var(--maroon-950) 100%);">
+                    👤
+                </div>
+            <?php endif; ?>
+            <div class="speaker-info">
+                <h3><?php echo htmlspecialchars($s['name']); ?></h3>
+                <div class="role"><?php echo htmlspecialchars($role); ?></div>
+                <?php if (!empty($org)): ?>
+                    <div class="org"><?php echo htmlspecialchars($org); ?></div>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php else: ?>
+    <div class="speaker-card"><img src="https://i0.wp.com/hotelmanagersconference.com/wp-content/uploads/2024/05/Speaker-1.png?fit=600%2C600&ssl=1" alt="Ahmed Raza" class="speaker-img" loading="lazy"/><div class="speaker-info"><h3>Ahmed Raza</h3><div class="role">General Manager</div><div class="org">Radisson Blu, Victoria Island Lagos</div></div></div>
+    <div class="speaker-card"><img src="https://i0.wp.com/hotelmanagersconference.com/wp-content/uploads/2025/05/speakers-1.png?fit=600%2C600&ssl=1" alt="Dr. Belinda Nwosu, FIH" class="speaker-img" loading="lazy"/><div class="speaker-info"><h3>Dr. Belinda Nwosu, FIH</h3><div class="role">Faculty &amp; Director, LBS Hospitality Initiative</div><div class="org">Lagos Business School</div></div></div>
+    <div class="speaker-card"><img src="https://i0.wp.com/hotelmanagersconference.com/wp-content/uploads/2025/05/4.png?fit=600%2C600&ssl=1" alt="Prof. Wasiu Babalola" class="speaker-img" loading="lazy"/><div class="speaker-info"><h3>Prof. Wasiu Babalola</h3><div class="role">SVP Africa, Continent Worldwide Hotels (Türkiye)</div><div class="org">Atiba University, Oyo</div></div></div>
+    <div class="speaker-card"><img src="https://i0.wp.com/hotelmanagersconference.com/wp-content/uploads/2021/10/speakers-1.png?fit=600%2C600&ssl=1" alt="Karl Hala" class="speaker-img" loading="lazy"/><div class="speaker-info"><h3>Karl Hala</h3><div class="role">Group General Manager</div><div class="org">Continental Hotels, Nigeria</div></div></div>
+<?php endif; ?>
 </div>
-<p style="margin-top:40px;text-align:center;font-size:13px;color:rgba(212,175,55,.7);font-style:italic">+ 24 hospitality leaders confirmed — GMs, brand owners, academics, and operators from across 16 African countries</p>
+<div style="text-align:center;margin-top:40px">
+    <a href="tickets" class="btn-outline" style="border-color:var(--gold-400);color:var(--gold-300);text-decoration:none;">See All Speakers</a>
+</div>
 
 <!-- CTA BLOCK AFTER SPEAKERS -->
 <div style="margin-top:56px">
@@ -1289,7 +1352,7 @@ The Future Of African Hospitality<br>
 <div class="footer-grid">
 <div>
 <a href="./" class="footer-brand">
-<img src="https://hotelmanagersconference.com/landingpage/images/hmc_logo.png" alt="HMC Africa" style="height: 40px;">
+<img src="<?php echo htmlspecialchars($project_base); ?>images/logo.png" alt="HMC Africa" style="height: 40px;">
 </a>
 <p class="footer-desc">Hotel Managers Conference Africa is the continent's flagship gathering of hospitality leadership. Built by hoteliers, for hoteliers — to synergise for sustainable growth through global best practices.</p>
 </div>
@@ -1329,6 +1392,13 @@ The Future Of African Hospitality<br>
 </div>
 </div>
 
+<!-- STICKY CTA FOOTER -->
+<div class="sticky-cta-footer" id="stickyCTAFooter" style="display:none">
+<div class="sticky-cta-footer-inner">
+© 2026 All rights reserved. Built and Powered by <a href="https://www.dreem.com.ng/" target="_blank" class="sticky-cta-footer-link">DreemTec</a>.
+</div>
+</div>
+
 <script>
 // COUNTDOWN
 function updateCountdown(){
@@ -1354,9 +1424,14 @@ setInterval(updateCountdown,1000);
 
 // STICKY CTA
 var sticky=document.getElementById('stickyCTA');
-window.addEventListener('scroll',function(){
-sticky.style.display=window.scrollY>600?'flex':'none';
-},{passive:true});
+var stickyFooter=document.getElementById('stickyCTAFooter');
+if (sticky && stickyFooter) {
+    window.addEventListener('scroll',function(){
+    var showSticky=window.scrollY>600;
+    sticky.style.display=showSticky?'flex':'none';
+    stickyFooter.style.display=showSticky?'flex':'none';
+    },{passive:true});
+}
 </script>
 </body>
 </html>
