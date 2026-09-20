@@ -10,38 +10,66 @@ $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $success_message = '';
 $error_message = '';
 
+if (!$pdo instanceof PDO) {
+    $error_message = 'Database connection is unavailable. Check the database credentials and ensure MySQL is running.';
+    $action = 'error';
+}
+
 // Handle CRUD Operations
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($pdo instanceof PDO && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['save_gallery'])) {
         $category   = trim($_POST['category']);
         $year       = isset($_POST['year']) ? intval($_POST['year']) : 2026;
-        $image_path = trim($_POST['image_path']); // Cloudinary URL from hidden input
+        $image_input = isset($_POST['image_path']) ? $_POST['image_path'] : '';
+        $image_urls = [];
+
+        if (is_array($image_input)) {
+            foreach ($image_input as $v) {
+                $clean = trim((string)$v);
+                if ($clean !== '') $image_urls[] = $clean;
+            }
+        } else {
+            $decoded = json_decode((string)$image_input, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $v) {
+                    $clean = trim((string)$v);
+                    if ($clean !== '') $image_urls[] = $clean;
+                }
+            } else {
+                $clean = trim((string)$image_input);
+                if ($clean !== '') $image_urls[] = $clean;
+            }
+        }
 
         if (empty($category)) {
             $category = 'general';
         }
 
-        if (empty($image_path)) {
-            $error_message = 'Gallery Photo is a required field.';
+        if (empty($image_urls)) {
+            $error_message = 'At least one gallery image is required.';
         } else {
             try {
                 if ($id > 0) {
+                    $first_image = $image_urls[0];
                     $stmt = $pdo->prepare("UPDATE `gallery` SET `category` = :category, `year` = :year, `image_path` = :image_path WHERE `id` = :id");
                     $stmt->execute([
                         'category'   => $category,
                         'year'       => $year,
-                        'image_path' => $image_path,
+                        'image_path' => $first_image,
                         'id'         => $id
                     ]);
                     $success_message = 'Gallery item updated successfully.';
                 } else {
-                    $stmt = $pdo->prepare("INSERT INTO `gallery` (`category`, `year`, `image_path`) VALUES (:category, :year, :image_path)");
-                    $stmt->execute([
-                        'category'   => $category,
-                        'year'       => $year,
-                        'image_path' => $image_path
-                    ]);
-                    $success_message = 'New gallery item added successfully.';
+                    $insert_sql = "INSERT INTO `gallery` (`category`, `year`, `image_path`) VALUES (:category, :year, :image_path)";
+                    $stmt = $pdo->prepare($insert_sql);
+                    foreach ($image_urls as $image_url) {
+                        $stmt->execute([
+                            'category'   => $category,
+                            'year'       => $year,
+                            'image_path' => $image_url
+                        ]);
+                    }
+                    $success_message = count($image_urls) === 1 ? 'New gallery item added successfully.' : 'New gallery items added successfully.';
                 }
                 $action = 'list';
             } catch (PDOException $e) {
@@ -52,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Handle Delete
-if ($action === 'delete' && $id > 0) {
+if ($pdo instanceof PDO && $action === 'delete' && $id > 0) {
     try {
         $stmt = $pdo->prepare("DELETE FROM `gallery` WHERE `id` = :id");
         $stmt->execute(['id' => $id]);
@@ -66,7 +94,7 @@ if ($action === 'delete' && $id > 0) {
 
 // Fetch single gallery item for edit
 $gallery_item = null;
-if ($action === 'edit' && $id > 0) {
+if ($pdo instanceof PDO && $action === 'edit' && $id > 0) {
     try {
         $stmt = $pdo->prepare("SELECT * FROM `gallery` WHERE `id` = :id");
         $stmt->execute(['id' => $id]);
@@ -83,7 +111,7 @@ if ($action === 'edit' && $id > 0) {
 
 // Fetch all gallery items
 $gallery_items = [];
-if ($action === 'list') {
+if ($pdo instanceof PDO && $action === 'list') {
     try {
         $gallery_items = $pdo->query("SELECT * FROM `gallery` ORDER BY `id` ASC")->fetchAll();
     } catch (PDOException $e) {
@@ -187,8 +215,9 @@ if ($action === 'list') {
                 'field_name'  => 'image_path',
                 'widget_id'   => 'gallery',
                 'current_url' => ($gallery_item && !empty($gallery_item['image_path'])) ? $gallery_item['image_path'] : '',
-                'label'       => 'Gallery Photo',
-                'optional'    => false
+                'label'       => 'Gallery Photos',
+                'optional'    => false,
+                'multiple'    => true
             ]);
             ?>
 

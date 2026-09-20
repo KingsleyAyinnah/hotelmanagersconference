@@ -584,6 +584,105 @@ if ($pdo) {
             animation: spin 0.8s linear infinite;
         }
 
+        .upload-queue {
+            margin-top: 12px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .upload-file-progress {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .upload-file-progress.complete {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .upload-file-progress.error {
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .upload-file-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 11px;
+            color: #334155;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .upload-file-percent {
+            font-weight: 700;
+            color: #1d4ed8;
+            white-space: nowrap;
+        }
+
+        .upload-file-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .upload-file-fill {
+            display: block;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #b45309);
+            border-radius: 999px;
+            transition: width 0.2s ease;
+        }
+
+        .upload-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .upload-preview-card {
+            position: relative;
+            aspect-ratio: 1;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .upload-preview-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .upload-preview-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.78);
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 24px;
+        }
+
+        .upload-preview-remove:hover {
+            background: #991b1b;
+        }
+
         .upload-error {
             display: none;
             margin-top: 8px;
@@ -780,9 +879,11 @@ const HMC_CLOUDINARY = {
  * @param {string} config.hiddenInputId  - ID of the <input type="hidden"> to store Cloudinary URL
  * @param {string} config.previewId      - ID of the .upload-preview container
  * @param {string} config.previewImgId   - ID of the <img> inside preview
+ * @param {string} config.queueId        - ID of the queue listing per-file progress
  * @param {string} config.progressId     - ID of the .upload-progress element
  * @param {string} config.errorId        - ID of the .upload-error element
  * @param {string} config.clearBtnId     - ID of the clear button inside preview
+ * @param {boolean} config.multiple      - Whether multiple files are allowed
  */
 function initImageUploadWidget(config) {
     const dropZone = document.getElementById(config.dropZoneId);
@@ -790,13 +891,59 @@ function initImageUploadWidget(config) {
     const hiddenInput = document.getElementById(config.hiddenInputId);
     const preview = document.getElementById(config.previewId);
     const previewImg = document.getElementById(config.previewImgId);
+    const previewGrid = document.getElementById(config.previewGridId);
+    const queue = document.getElementById(config.queueId);
     const progress = document.getElementById(config.progressId);
     const errorEl = document.getElementById(config.errorId);
     const clearBtn = document.getElementById(config.clearBtnId);
+    const isMultiple = !!config.multiple;
 
     if (!dropZone || !fileInput || !hiddenInput) return;
 
-    // Drag and drop styling
+    let uploadedUrls = [];
+    if (hiddenInput.value) {
+        try {
+            const parsed = JSON.parse(hiddenInput.value);
+            if (Array.isArray(parsed)) uploadedUrls = parsed;
+            else if (typeof hiddenInput.value === 'string' && hiddenInput.value.trim()) uploadedUrls = [hiddenInput.value.trim()];
+        } catch (e) {
+            uploadedUrls = hiddenInput.value ? [hiddenInput.value.trim()] : [];
+        }
+    }
+
+    function renderPreviewGrid() {
+        if (!previewGrid) return;
+        previewGrid.innerHTML = '';
+        uploadedUrls.forEach(function(url, index) {
+            const card = document.createElement('div');
+            card.className = 'upload-preview-card';
+
+            const image = document.createElement('img');
+            image.src = url;
+            image.alt = 'Uploaded image ' + (index + 1);
+
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'upload-preview-remove';
+            remove.title = 'Remove image';
+            remove.setAttribute('aria-label', 'Remove image ' + (index + 1));
+            remove.textContent = '×';
+            remove.addEventListener('click', function() {
+                uploadedUrls.splice(index, 1);
+                updateHiddenValue();
+                renderPreviewGrid();
+            });
+
+            card.appendChild(image);
+            card.appendChild(remove);
+            previewGrid.appendChild(card);
+        });
+    }
+
+    if (isMultiple) {
+        renderPreviewGrid();
+    }
+
     dropZone.addEventListener('dragover', function(e) {
         e.preventDefault();
         dropZone.classList.add('drag-over');
@@ -808,24 +955,27 @@ function initImageUploadWidget(config) {
         e.preventDefault();
         dropZone.classList.remove('drag-over');
         const files = e.dataTransfer.files;
-        if (files && files[0]) {
-            handleFileUpload(files[0]);
+        if (files && files.length) {
+            handleSelectedFiles(files);
         }
     });
 
     fileInput.addEventListener('change', function() {
-        if (fileInput.files && fileInput.files[0]) {
-            handleFileUpload(fileInput.files[0]);
+        if (fileInput.files && fileInput.files.length) {
+            handleSelectedFiles(fileInput.files);
+            fileInput.value = '';
         }
     });
 
     if (clearBtn) {
         clearBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            hiddenInput.value = '';
+            uploadedUrls = [];
+            hiddenInput.value = isMultiple ? JSON.stringify(uploadedUrls) : '';
             if (preview) preview.classList.remove('visible');
             if (previewImg) previewImg.src = '';
-            fileInput.value = '';
+            if (queue) queue.innerHTML = '';
+            if (previewGrid) previewGrid.innerHTML = '';
             hideError();
         });
     }
@@ -844,85 +994,144 @@ function initImageUploadWidget(config) {
         }
     }
 
-    function handleFileUpload(file) {
+    function updateHiddenValue() {
+        if (!isMultiple) {
+            hiddenInput.value = uploadedUrls.length ? uploadedUrls[0] : '';
+            return;
+        }
+        hiddenInput.value = JSON.stringify(uploadedUrls);
+    }
+
+    function addQueueRow(file, label) {
+        if (!queue) return null;
+        const row = document.createElement('div');
+        row.className = 'upload-file-progress';
+        row.innerHTML = '<div class="upload-file-meta"><span>' + label + '</span><span class="upload-file-percent">0%</span></div><div class="upload-file-bar"><div class="upload-file-fill"></div></div>';
+        queue.appendChild(row);
+        return row;
+    }
+
+    function handleSelectedFiles(files) {
         hideError();
+        const imageFiles = Array.from(files).filter(file => file && file.type.startsWith('image/'));
+        const invalidFiles = Array.from(files).filter(file => file && !file.type.startsWith('image/'));
 
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-            showError('Please select an image file (JPG, PNG, WebP, GIF).');
-            return;
+        if (invalidFiles.length) {
+            showError('Please select image files only (JPG, PNG, WebP, GIF).');
         }
 
-        // Validate file size (10MB max)
-        if (file.size > 10 * 1024 * 1024) {
-            showError('Image must be under 10MB.');
-            return;
+        const sizeBad = imageFiles.filter(file => file.size > 10 * 1024 * 1024);
+        if (sizeBad.length) {
+            showError('Each selected image must be under 10MB.');
         }
 
-        // Check if Cloudinary is configured
+        const validFiles = imageFiles.filter(file => file.size <= 10 * 1024 * 1024);
+        if (!validFiles.length) return;
         if (!HMC_CLOUDINARY.cloudName || !HMC_CLOUDINARY.apiKey) {
-            // Fallback: show local preview, use object URL as placeholder
-            showLocalPreview(file);
-            showError('⚠️ Cloudinary is not configured yet. Go to Site Settings → Cloudinary to set it up. The image will not be saved until Cloudinary is configured.');
+            if (!isMultiple) {
+                const file = validFiles[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (previewImg) previewImg.src = e.target.result;
+                    if (preview) preview.classList.add('visible');
+                };
+                reader.readAsDataURL(file);
+            }
+            showError('⚠️ Cloudinary is not configured yet. Go to Site Settings → Cloudinary to set it up.');
             return;
         }
 
-        // Show uploading progress
         if (progress) progress.classList.add('visible');
         if (preview) preview.classList.remove('visible');
 
-        // Fetch signed parameters from backend
-        fetch('cloudinary_sign.php')
-        .then(function(res) {
-            if (!res.ok) throw new Error('Failed to retrieve upload signature from server.');
-            return res.json();
-        })
-        .then(function(signData) {
-            if (signData.error) {
-                throw new Error(signData.error);
-            }
+        validFiles.forEach(function(file) {
+            const row = addQueueRow(file, file.name);
+            const percentEl = row ? row.querySelector('.upload-file-percent') : null;
+            const fillEl = row ? row.querySelector('.upload-file-fill') : null;
 
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('api_key', signData.api_key);
-            formData.append('timestamp', signData.timestamp);
-            formData.append('signature', signData.signature);
-            formData.append('folder', signData.folder);
+            fetch('cloudinary_sign.php')
+            .then(function(res) {
+                if (!res.ok) throw new Error('Failed to retrieve upload signature from server.');
+                return res.json();
+            })
+            .then(function(signData) {
+                if (signData.error) {
+                    throw new Error(signData.error);
+                }
 
-            return fetch('https://api.cloudinary.com/v1_1/' + HMC_CLOUDINARY.cloudName + '/image/upload', {
-                method: 'POST',
-                body: formData
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('api_key', signData.api_key);
+                formData.append('timestamp', signData.timestamp);
+                formData.append('signature', signData.signature);
+                formData.append('folder', signData.folder || 'hmc-gallery');
+
+                return new Promise(function(resolve, reject) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + HMC_CLOUDINARY.cloudName + '/image/upload');
+                    xhr.upload.addEventListener('progress', function(evt) {
+                        if (!evt.lengthComputable) return;
+                        const pct = Math.round((evt.loaded / evt.total) * 100);
+                        if (percentEl) percentEl.textContent = pct + '%';
+                        if (fillEl) fillEl.style.width = pct + '%';
+                    });
+                    xhr.onload = function() {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                const data = JSON.parse(xhr.responseText);
+                                resolve(data);
+                            } catch (err) {
+                                reject(new Error('Invalid upload response.'));
+                            }
+                        } else {
+                            reject(new Error('Upload failed: ' + xhr.status));
+                        }
+                    };
+                    xhr.onerror = function() {
+                        reject(new Error('Connection error while uploading.'));
+                    };
+                    xhr.send(formData);
+                });
+            })
+            .then(function(data) {
+                if (data && data.secure_url) {
+                    uploadedUrls.push(data.secure_url);
+                    updateHiddenValue();
+                    if (isMultiple) {
+                        renderPreviewGrid();
+                    }
+                    if (!isMultiple && previewImg) {
+                        previewImg.src = data.secure_url;
+                        if (preview) preview.classList.add('visible');
+                    }
+                    if (row) {
+                        row.classList.add('complete');
+                        row.querySelector('.upload-file-percent').textContent = 'Uploaded';
+                        row.querySelector('.upload-file-fill').style.width = '100%';
+                    }
+                }
+            })
+            .catch(function(err) {
+                if (row) {
+                    row.classList.add('error');
+                    row.querySelector('.upload-file-percent').textContent = 'Failed';
+                }
+                showError('Upload failed for one or more files: ' + err.message);
+            })
+            .finally(function() {
+                if (progress && queue) {
+                    const remaining = queue.querySelectorAll('.upload-file-progress:not(.complete):not(.error)').length;
+                    if (remaining === 0) {
+                        progress.classList.remove('visible');
+                    }
+                }
+                if (row && row.classList.contains('complete')) {
+                    setTimeout(function() {
+                        row.style.opacity = '0.8';
+                    }, 350);
+                }
             });
-        })
-        .then(function(res) {
-            if (!res) return;
-            if (!res.ok) throw new Error('Upload failed: ' + res.status);
-            return res.json();
-        })
-        .then(function(data) {
-            if (!data) return;
-            if (progress) progress.classList.remove('visible');
-            if (data.secure_url) {
-                hiddenInput.value = data.secure_url;
-                if (previewImg) previewImg.src = data.secure_url;
-                if (preview) preview.classList.add('visible');
-            } else {
-                showError('Upload succeeded but no URL was returned. Please try again.');
-            }
-        })
-        .catch(function(err) {
-            if (progress) progress.classList.remove('visible');
-            showError('Upload failed: ' + err.message + '. Check your Cloudinary settings.');
         });
-    }
-
-    function showLocalPreview(file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            if (previewImg) previewImg.src = e.target.result;
-            if (preview) preview.classList.add('visible');
-        };
-        reader.readAsDataURL(file);
     }
 }
 
