@@ -154,6 +154,7 @@ try {
         `email` VARCHAR(100) NOT NULL,
         `phone` VARCHAR(50) NOT NULL,
         `org` VARCHAR(100) NULL,
+        `position_held` VARCHAR(100) NULL,
         `ticket_type` VARCHAR(100) NOT NULL,
         `amount` VARCHAR(50) NOT NULL,
         `payment_method` VARCHAR(50) NULL,
@@ -161,6 +162,15 @@ try {
         `payment_reference` VARCHAR(100) UNIQUE NULL,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;");
+    try {
+        $position_col = $pdo->query("SHOW COLUMNS FROM `reservations` LIKE 'position_held'");
+        if ($position_col && $position_col->fetch() === false) {
+            $pdo->exec("ALTER TABLE `reservations` ADD `position_held` VARCHAR(100) NULL AFTER `org`");
+            echo "Added 'position_held' column to reservations table.\n";
+        }
+    } catch (PDOException $migration_error) {
+        echo "Reservations migration note: " . $migration_error->getMessage() . "\n";
+    }
     echo "Table 'reservations' verified.\n";
 
     // Sponsors Table

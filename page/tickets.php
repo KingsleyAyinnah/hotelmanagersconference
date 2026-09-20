@@ -1,6 +1,23 @@
 <?php
 require_once '../config/config.php';
 
+function ensureReservationPositionField($pdo) {
+    if (!$pdo) {
+        return;
+    }
+
+    try {
+        $column_check = $pdo->query("SHOW COLUMNS FROM `reservations` LIKE 'position_held'");
+        if ($column_check && $column_check->fetch() === false) {
+            $pdo->exec("ALTER TABLE `reservations` ADD `position_held` VARCHAR(100) NULL AFTER `org`");
+        }
+    } catch (PDOException $e) {
+        // Ignore migration errors; the form will still work with the old schema if needed.
+    }
+}
+
+ensureReservationPositionField($pdo);
+
 // Helper functions for currency/parsing and verification
 function getNumericPriceAndCurrency($ticket) {
     $amount = 0;
@@ -54,9 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['ac
     $user_email = isset($_POST['email']) ? trim($_POST['email']) : '';
     $user_phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
     $organization = isset($_POST['org']) ? trim($_POST['org']) : '';
+    $position_held = isset($_POST['position_held']) ? trim($_POST['position_held']) : '';
     $ticket_type = isset($_POST['ticket_type']) ? trim($_POST['ticket_type']) : '';
 
-    if (empty($full_name) || empty($user_email) || empty($user_phone) || empty($ticket_type)) {
+    if (empty($full_name) || empty($user_email) || empty($user_phone) || empty($organization) || empty($position_held) || empty($ticket_type)) {
         echo json_encode(['success' => false, 'message' => 'Please fill in all required fields marked with an asterisk (*).']);
         exit;
     }
@@ -87,16 +105,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['ac
 
     if ($pdo) {
         try {
-            $stmt = $pdo->prepare("INSERT INTO `reservations` (`fullname`, `email`, `phone`, `org`, `ticket_type`, `amount`, `payment_status`, `payment_reference`) VALUES (:fullname, :email, :phone, :org, :ticket_type, :amount, 'Pending', :reference)");
-            $stmt->execute([
-                'fullname' => $full_name,
-                'email' => $user_email,
-                'phone' => $user_phone,
-                'org' => $organization,
-                'ticket_type' => $ticket_type,
-                'amount' => $amount_db,
-                'reference' => $reference
-            ]);
+            $position_column_exists = false;
+            try {
+                $col_check = $pdo->query("SHOW COLUMNS FROM `reservations` LIKE 'position_held'");
+                $position_column_exists = ($col_check && $col_check->fetch() !== false);
+            } catch (PDOException $e_col) {
+                $position_column_exists = false;
+            }
+
+            if ($position_column_exists) {
+                $stmt = $pdo->prepare("INSERT INTO `reservations` (`fullname`, `email`, `phone`, `org`, `position_held`, `ticket_type`, `amount`, `payment_status`, `payment_reference`) VALUES (:fullname, :email, :phone, :org, :position_held, :ticket_type, :amount, 'Pending', :reference)");
+                $stmt->execute([
+                    'fullname' => $full_name,
+                    'email' => $user_email,
+                    'phone' => $user_phone,
+                    'org' => $organization,
+                    'position_held' => $position_held,
+                    'ticket_type' => $ticket_type,
+                    'amount' => $amount_db,
+                    'reference' => $reference
+                ]);
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO `reservations` (`fullname`, `email`, `phone`, `org`, `ticket_type`, `amount`, `payment_status`, `payment_reference`) VALUES (:fullname, :email, :phone, :org, :ticket_type, :amount, 'Pending', :reference)");
+                $stmt->execute([
+                    'fullname' => $full_name,
+                    'email' => $user_email,
+                    'phone' => $user_phone,
+                    'org' => $organization,
+                    'ticket_type' => $ticket_type,
+                    'amount' => $amount_db,
+                    'reference' => $reference
+                ]);
+            }
 
             // Fetch active bank, event and contact settings for the confirmation email
             $bank_name_val = 'Zenith Bank';
@@ -182,6 +222,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['ac
                                 <div class="details-row">
                                     <span class="details-label">Organization:</span>
                                     <span class="details-value">' . htmlspecialchars($organization) . '</span>
+                                </div>' : '') . '
+                                ' . (!empty($position_held) ? '
+                                <div class="details-row">
+                                    <span class="details-label">Position Held:</span>
+                                    <span class="details-value">' . htmlspecialchars($position_held) . '</span>
                                 </div>' : '') . '
                                 <div class="details-row">
                                     <span class="details-label">Status:</span>
@@ -284,6 +329,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['ac
                                 <div class="details-row">
                                     <span class="details-label">Organization:</span>
                                     <span class="details-value">' . htmlspecialchars($organization) . '</span>
+                                </div>' : '') . '
+                                ' . (!empty($position_held) ? '
+                                <div class="details-row">
+                                    <span class="details-label">Position Held:</span>
+                                    <span class="details-value">' . htmlspecialchars($position_held) . '</span>
                                 </div>' : '') . '
                             </div>
                             
@@ -964,8 +1014,13 @@ if ($pdo) {
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" for="org">Organization / Hotel Name</label>
-                            <input type="text" name="org" id="org" class="form-input" placeholder="e.g. Lagos Continental Hotel" value="">
+                            <label class="form-label" for="org">Organization / Hotel Name *</label>
+                            <input type="text" name="org" id="org" class="form-input" required placeholder="e.g. Lagos Continental Hotel" value="">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="position_held">Position Held *</label>
+                            <input type="text" name="position_held" id="position_held" class="form-input" required placeholder="e.g. General Manager" value="">
                         </div>
 
                         <div class="form-group">
@@ -988,6 +1043,18 @@ if ($pdo) {
 
                         <button type="submit" id="submit-btn" class="btn-primary" style="width: 100%; border: none; justify-content: center; font-size: 13px; padding: 16px; cursor: pointer;">Submit Seat Reservation →</button>
                     </form>
+
+                    <div id="reservation-summary" style="display:none; margin-top: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.2); border-radius: 12px; padding: 18px 20px; color: var(--cream);">
+                        <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold-300); margin-bottom: 12px; font-weight:700;">Reservation Summary</div>
+                        <div style="display:flex; justify-content:space-between; gap:12px; margin-bottom:8px; font-size:12px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:6px;">
+                            <span style="color:var(--gold-200);">Organization:</span>
+                            <strong id="summary-org" style="color:var(--white); text-align:right;">-</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; gap:12px; font-size:12px;">
+                            <span style="color:var(--gold-200);">Position Held:</span>
+                            <strong id="summary-position" style="color:var(--white); text-align:right;">-</strong>
+                        </div>
+                    </div>
 
                     <!-- Payment Options Panel (dynamically expanded below submit button via JS) -->
                     <div id="payment-methods-section" class="payment-section">
@@ -1087,8 +1154,22 @@ document.addEventListener('DOMContentLoaded', function() {
     var resForm = document.getElementById('reservation-form');
     var submitBtn = document.getElementById('submit-btn');
     var paymentSection = document.getElementById('payment-methods-section');
+    var reservationSummary = document.getElementById('reservation-summary');
+    var summaryOrg = document.getElementById('summary-org');
+    var summaryPosition = document.getElementById('summary-position');
     var jsErrorAlert = document.getElementById('js-error-alert');
     var reservationContext = null;
+
+    function showReservationSummary() {
+        if (!reservationSummary || !summaryOrg || !summaryPosition || !resForm) return;
+
+        var orgValue = (resForm.querySelector('#org') || {}).value || '';
+        var positionValue = (resForm.querySelector('#position_held') || {}).value || '';
+
+        summaryOrg.textContent = orgValue.trim() || 'Not specified';
+        summaryPosition.textContent = positionValue.trim() || 'Not specified';
+        reservationSummary.style.display = 'block';
+    }
 
     if (resForm) {
         resForm.addEventListener('submit', function(e) {
@@ -1100,6 +1181,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.textContent = 'Processing Seat Reservation...';
 
             var formData = new FormData(resForm);
+            showReservationSummary();
             
             fetch('tickets?action=reserve', {
                 method: 'POST',

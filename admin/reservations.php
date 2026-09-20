@@ -3,6 +3,23 @@ $page_title = 'Manage Seat Reservations';
 $page_header = 'Seat Reservations & Ticketing Ledger';
 require_once 'admin_header.php';
 
+function ensureReservationPositionField($pdo) {
+    if (!$pdo) {
+        return;
+    }
+
+    try {
+        $column_check = $pdo->query("SHOW COLUMNS FROM `reservations` LIKE 'position_held'");
+        if ($column_check && $column_check->fetch() === false) {
+            $pdo->exec("ALTER TABLE `reservations` ADD `position_held` VARCHAR(100) NULL AFTER `org`");
+        }
+    } catch (PDOException $e) {
+        // Ignore migration errors; the ledger will still display the standard fields.
+    }
+}
+
+ensureReservationPositionField($pdo);
+
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -125,6 +142,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <span class="details-label">Amount:</span>
                                             <span class="details-value" style="font-weight: 700;">' . htmlspecialchars($r['amount']) . '</span>
                                         </div>
+                                        ' . (!empty($r['position_held']) ? '
+                                        <div class="details-row">
+                                            <span class="details-label">Position Held:</span>
+                                            <span class="details-value">' . htmlspecialchars($r['position_held']) . '</span>
+                                        </div>' : '') . '
                                         <div class="details-row">
                                             <span class="details-label">Payment Method:</span>
                                             <span class="details-value">' . htmlspecialchars($new_method ?: 'Not Specified') . '</span>
@@ -334,6 +356,7 @@ if ($pdo) {
                     <tr>
                         <th>Attendee Details</th>
                         <th>Organization</th>
+                        <th>Position Held</th>
                         <th>Ticket Class</th>
                         <th>Amount</th>
                         <th>Payment Detail</th>
@@ -364,6 +387,9 @@ if ($pdo) {
                             </td>
                             <td>
                                 <?php echo !empty($r['org']) ? htmlspecialchars($r['org']) : '<span style="color:#94a3b8; font-style:italic;">Not Specified</span>'; ?>
+                            </td>
+                            <td>
+                                <?php echo !empty($r['position_held']) ? htmlspecialchars($r['position_held']) : '<span style="color:#94a3b8; font-style:italic;">Not Specified</span>'; ?>
                             </td>
                             <td style="font-weight: 600; color: var(--maroon-900);">
                                 <?php echo htmlspecialchars($r['ticket_type']); ?>

@@ -1,5 +1,5 @@
 <?php
-$page_title = 'Hotel Managers Conference Africa 2026';
+$page_title = 'Hotel Managers Conference Africa 7';
 require_once 'header.php';
 
 // Fetch dynamic data from database
@@ -40,25 +40,25 @@ if ($pdo) {
                     style="background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.35); border-radius: 50px; padding: 6px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold-300); margin-bottom: 24px; display: inline-flex; align-items: center; gap: 8px;">
                     <span
                         style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%; display: inline-block; animation: pulse 2s infinite;"></span>
-                    HMC Africa 2026
+                    HMC Africa 2027
                 </div>
                 <h1 class="font-display"
                     style="font-size: clamp(32px, 4.5vw, 52px); font-weight: 900; line-height: 1.15; margin-bottom: 24px; color: var(--cream);">
                     Hotel Managers Conference <br>
                     <span
                         style="background: linear-gradient(90deg, var(--gold-200), var(--gold-400), var(--gold-200)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Africa
-                        2026</span>
+                        2027</span>
                 </h1>
                 <p
                     style="font-size: clamp(16px, 1.8vw, 20px); color: var(--gold-200); font-weight: 600; margin-bottom: 12px; letter-spacing: 0.05em;">
-                    📍 Lagos Continental Hotel, Victoria Island
+                    📍 Lagos, Victoria Island
                 </p>
                 <p
                     style="font-size: 15px; color: rgba(253, 247, 240, 0.85); font-weight: 500; margin-bottom: 36px; letter-spacing: 0.05em; text-transform: uppercase;">
-                    📅 July 11th &amp; 12th, 2026
+                    📅 July 10th &amp; 11th, 2027
                 </p>
                 <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-                    <a href="https://forms.gle/ry9FiboPx33XobwK9" class="btn-primary"
+                    <a href="https://forms.gle/AYAUBBzLPuYbHDx9A" class="btn-primary"
                         style="background: var(--gold-400); color: var(--maroon-950); padding: 14px 32px; border-radius: 50px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s;">Register
                         Here</a>
                     <a href="about" class="btn-outline"
@@ -192,7 +192,7 @@ if ($pdo) {
             <div>
                 <span
                     style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--gold-400); letter-spacing: 0.15em; display: block; margin-bottom: 8px;">HMC
-                    Africa 2026 Theme</span>
+                    Africa 2027 Theme</span>
                 <h2 class="font-display"
                     style="font-size: clamp(24px, 3vw, 36px); color: var(--cream); font-weight: 700; line-height: 1.25;">
                     "Raising the Bar: <br>
@@ -206,7 +206,7 @@ if ($pdo) {
                     delivering exceptional service, and embracing adaptable standards.
                 </p>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <a href="https://forms.gle/ry9FiboPx33XobwK9" class="btn-primary"
+                    <a href="https://forms.gle/AYAUBBzLPuYbHDx9A" class="btn-primary"
                         style="padding: 12px 24px; font-size: 13px;">Register Here</a>
                     <a href="about" class="btn-outline"
                         style="padding: 11px 22px; font-size: 13px; border-color: rgba(253,247,240,0.35);">About
@@ -719,7 +719,7 @@ if ($pdo) {
                     Headline Sponsor</div>
                 <div
                     style="display: inline-flex; align-items: center; justify-content: center; width: 500px; height: 250px; border: 1.5px solid var(--gold-400); background: var(--cream); border-radius: 12px; font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900; color: var(--maroon-950); box-shadow: 0 8px 24px rgba(212,175,55,0.12); padding: 24px; box-sizing: border-box; line-height: 1.2; text-align: center; max-width: 100%;">
-                    ⭐ LAGOS CONTINENTAL ⭐
+                    ⭐ LAGOS NIGERIA ⭐
                 </div>
             </div>
         <?php endif; ?>
@@ -775,7 +775,7 @@ if ($pdo) {
             <div
                 style="background: linear-gradient(135deg, var(--maroon-900) 0%, var(--maroon-950) 100%); color: var(--cream); border-radius: 20px; padding: 40px; border: 1px solid var(--gold-400); text-align: center;">
                 <span style="font-size: 48px; margin-bottom: 12px; display: block;">🏆</span>
-                <h3 class="font-display" style="font-size: 20px; color: var(--gold-200); margin-bottom: 8px;">2026
+                <h3 class="font-display" style="font-size: 20px; color: var(--gold-200); margin-bottom: 8px;">2027
                     Voting Open</h3>
                 <p style="font-size: 13px; opacity: 0.8; margin-bottom: 20px; line-height: 1.6;">Voting is now open for
                     the General Manager of the Year, Boutique Hotel, and training brands.</p>

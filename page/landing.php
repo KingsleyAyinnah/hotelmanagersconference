@@ -6,7 +6,7 @@ require_once '../config/config.php';
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Hotel Managers Conference Africa 2026 | <?php echo htmlspecialchars($event_date_range); ?>, Lagos</title>
+<title>Hotel Managers Conference Africa 2027 | <?php echo htmlspecialchars($event_date_range); ?>, Lagos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -609,10 +609,10 @@ You will understand exactly what you are registering for in the next 60 seconds.
 <p>Africa's most prestigious hospitality awards — recognising excellence across properties, professionals and brands continent-wide. Be nominated. Be celebrated.</p>
 </div>
 <div class="what-card" style="border:2px solid var(--gold-400);background:linear-gradient(135deg,var(--gold-50),var(--cream))">
-<div class="what-card-tag" style="background:var(--gold-400);color:var(--maroon-950);border-color:var(--gold-400)">July 11–12</div>
+<div class="what-card-tag" style="background:var(--gold-400);color:var(--maroon-950);border-color:var(--gold-400)">July 10–11</div>
 <div class="what-card-icon" style="background:linear-gradient(135deg,var(--maroon-100),var(--maroon-200))">📍</div>
 <h3 style="color:var(--maroon-900)">All Under One Roof</h3>
-<p style="color:rgba(45,26,16,.75)">Lagos Continental Hotel, Victoria Island — West Africa's most prestigious event venue. One ticket. Five experiences. Two transformational days.</p>
+<p style="color:rgba(45,26,16,.75)">Lagos Nigeria, Victoria Island — West Africa's most prestigious event venue. One ticket. Five experiences. Two transformational days.</p>
 </div>
 </div>
 
@@ -771,7 +771,7 @@ We've been doing this <span class="italic" style="color:var(--gold-600)">since 2
 <li><svg width="16" height="16" fill="none" stroke="var(--gold-300)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>On-demand replay access (30 days)</li>
 <li><svg width="16" height="16" fill="none" stroke="var(--gold-300)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Virtual speaker Q&amp;A</li>
 </ul>
-<a href="<?php echo htmlspecialchars($ticket_link); ?>" class="ticket-btn ticket-btn-outline">Register For HMC 2026 →</a>
+<a href="<?php echo htmlspecialchars($ticket_link); ?>" class="ticket-btn ticket-btn-outline">Register For HMC 2027 →</a>
 </div>
 
 <!-- REGULAR (FEATURED) -->
@@ -784,7 +784,7 @@ We've been doing this <span class="italic" style="color:var(--gold-600)">since 2
 <div class="ticket-price-sub">Conference pass · Accommodation optional add-on</div>
 <div class="ticket-savings">🔥 Early Bird — Save ₦50,000 before price increases</div>
 <ul class="ticket-features">
-<li><svg width="16" height="16" fill="none" stroke="var(--gold-300)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Full physical access — both days, July 11 &amp; 12</li>
+<li><svg width="16" height="16" fill="none" stroke="var(--gold-300)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Full physical access — both days, July 10 &amp; 11</li>
 <li><svg width="16" height="16" fill="none" stroke="var(--gold-300)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Grand African Ballroom, Lagos Continental</li>
 <li><svg width="16" height="16" fill="none" stroke="var(--gold-300)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>All masterclasses, panels &amp; workshops</li>
 <li><svg width="16" height="16" fill="none" stroke="var(--gold-300)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Exhibition hall — meet 200+ vendors live</li>
@@ -926,7 +926,7 @@ if ($pdo) {
 <h2 class="section-h2 font-display">
 See what happens when <span class="shine italic">Africa's best</span> gather in one room.
 </h2>
-<p class="section-p dark" style="margin-bottom:0">Seven editions. Thousands of careers elevated. Hundreds of deals made. Every year, bigger and better. HMC 2026 will be the largest yet.</p>
+<p class="section-p dark" style="margin-bottom:0">Seven editions. Thousands of careers elevated. Hundreds of deals made. Every year, bigger and better. HMC 2027 will be the largest yet.</p>
 </div>
 <div class="highlights-grid">
 <div class="highlight-card large">
@@ -973,7 +973,7 @@ See what happens when <span class="shine italic">Africa's best</span> gather in 
 </div>
 </div>
 <div style="text-align:center;margin-top:48px">
-<a href="<?php echo htmlspecialchars($ticket_link); ?>" class="btn-cta-primary" style="background:var(--gold-400);color:var(--maroon-950);padding:15px 36px;border-radius:50px;font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(212,175,55,.3)">Register For HMC 2026 — Secure Your Place →</a>
+<a href="<?php echo htmlspecialchars($ticket_link); ?>" class="btn-cta-primary" style="background:var(--gold-400);color:var(--maroon-950);padding:15px 36px;border-radius:50px;font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(212,175,55,.3)">Register For HMC 2027 — Secure Your Place →</a>
 </div>
 </div>
 </section>
@@ -1051,13 +1051,13 @@ Don't take our word for it.<br>
 A program engineered for <span class="shine italic">decision-makers,</span> not spectators.
 </h2>
 </div>
-<div class="program-row"><div class="program-day">Day 1 · Morning</div><div><h3 class="font-display">Opening Keynote &amp; Africa Hospitality Outlook 2026–2030</h3><p>Setting the scene: where the money, growth and opportunity is moving across the continent.</p></div></div>
+<div class="program-row"><div class="program-day">Day 1 · Morning</div><div><h3 class="font-display">Opening Keynote &amp; Africa Hospitality Outlook 2027–2030</h3><p>Setting the scene: where the money, growth and opportunity is moving across the continent.</p></div></div>
 <div class="program-row"><div class="program-day">Day 1 · Midday</div><div><h3 class="font-display">Masterclass: Operational Excellence Through Global Best Practices</h3><p>A working session — bring your operations challenge, leave with a 90-day plan.</p></div></div>
 <div class="program-row"><div class="program-day">Day 1 · Afternoon</div><div><h3 class="font-display">Panel: Brand Owners &amp; The Future of Africa's Hotel Landscape</h3><p>Karl Hala, Barr. Chike Ogeah, Ahmed Raza and more — unfiltered conversation, live Q&amp;A.</p></div></div>
 <div class="program-row"><div class="program-day">Day 1 · Evening</div><div><h3 class="font-display">Networking Cocktail at the Lagos Continental Terrace</h3><p>The room where deals actually get done. Dress code: smart elegant.</p></div></div>
 <div class="program-row"><div class="program-day">Day 2 · Morning</div><div><h3 class="font-display">Workshop: Building a 5-Star Talent &amp; Service Culture</h3><p>Dr. Belinda Nwosu (LBS) leads a deep-dive into people systems that retain top talent.</p></div></div>
 <div class="program-row"><div class="program-day">Day 2 · Midday</div><div><h3 class="font-display">Exhibition Hall + Tech Demos (IDS Next &amp; more)</h3><p>Hands-on with the PMS, RMS, energy and F&amp;B tech that will define the next 5 years.</p></div></div>
-<div class="program-row"><div class="program-day">Day 2 · Evening</div><div><h3 class="font-display">Gala Dinner &amp; The HMC Africa Awards 2026</h3><p>A black-tie celebration of the people and properties shaping hospitality excellence across Africa.</p></div></div>
+<div class="program-row"><div class="program-day">Day 2 · Evening</div><div><h3 class="font-display">Gala Dinner &amp; The HMC Africa Awards 2027</h3><p>A black-tie celebration of the people and properties shaping hospitality excellence across Africa.</p></div></div>
 
 <!-- CTA BLOCK AFTER PROGRAM -->
 <div style="margin-top:48px">
@@ -1231,7 +1231,7 @@ Why This Conference <span class="shine italic">Had to Exist.</span>
 <p>So Hotel Managers Conference Africa was founded to fill that gap — not as a one-off event, but as the annual gathering point for everyone serious about elevating African hospitality to world-class standards.</p>
 <p>Seven editions later, HMC Africa has become the continent's most anticipated hospitality event. Delegates now fly in from 16 countries. Brands queue to exhibit. Awards are the most coveted in the industry. And the conference keeps growing — because the mission has never changed:</p>
 <p><strong style="color:var(--gold-300)">To give every African hotelier access to the knowledge, networks, and opportunities they need to build something truly world-class.</strong></p>
-<p>HMC Africa 2026 — the 8th Edition — will be the largest, most impactful gathering yet. 900+ delegates. 20+ speakers. Two days. One room. One decision.</p>
+<p>HMC Africa 2027 — the 8th Edition — will be the largest, most impactful gathering yet. 900+ delegates. 20+ speakers. Two days. One room. One decision.</p>
 <p style="color:rgba(253,247,240,.5);font-style:italic;font-size:14px">Will you be in it?</p>
 </div>
 </div>
@@ -1375,7 +1375,7 @@ The Future Of African Hospitality<br>
 </div>
 </div>
 <div class="footer-bottom">
-<div>© 2026 Hotel Managers Conference Africa. All rights reserved.</div>
+<div>© 2027 Hotel Managers Conference Africa. All rights reserved.</div>
 <div>Synergising for Sustainable Growth Through Global Best Practices</div>
 </div>
 </div>
@@ -1384,7 +1384,7 @@ The Future Of African Hospitality<br>
 <!-- STICKY CTA BAR -->
 <div class="sticky-cta" id="stickyCTA" style="display:none">
 <div class="sticky-cta-inner">
-<div class="sticky-cta-text"><strong>HMC Africa 2026</strong> · July 11–12, Lagos · <strong>Early Bird Closing Soon</strong></div>
+<div class="sticky-cta-text"><strong>HMC Africa 2027</strong> · July 10–11, Lagos · <strong>Early Bird Closing Soon</strong></div>
 <div class="sticky-cta-btns">
 <a href="<?php echo htmlspecialchars($ticket_link); ?>" class="sticky-cta-btn">Reserve My Seat Now</a>
 <a href="tel:<?php echo $phone_number_link; ?>" class="sticky-cta-btn-secondary">📞 Call Us</a>
@@ -1395,14 +1395,14 @@ The Future Of African Hospitality<br>
 <!-- STICKY CTA FOOTER -->
 <div class="sticky-cta-footer" id="stickyCTAFooter" style="display:none">
 <div class="sticky-cta-footer-inner">
-© 2026 All rights reserved. Built and Powered by <a href="https://www.dreem.com.ng/" target="_blank" class="sticky-cta-footer-link">DreemTec</a>.
+© 2027 All rights reserved. Built and Powered by <a href="https://www.dreem.com.ng/" target="_blank" class="sticky-cta-footer-link">DreemTec</a>.
 </div>
 </div>
 
 <script>
 // COUNTDOWN
 function updateCountdown(){
-var target=new Date('2026-07-11T08:00:00+01:00');
+var target=new Date('2027-07-11T08:00:00+01:00');
 var now=new Date();
 var diff=target-now;
 if(diff<0)diff=0;
