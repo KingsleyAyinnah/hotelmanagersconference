@@ -16,7 +16,7 @@ $event_date = 'July 11 & 12, 2026';
 $event_date_range = 'July 11–12, 2026';
 $event_location = 'Lagos Continental Hotel, Victoria Island';
 $event_location_short = 'Lagos Continental Hotel';
-$ticket_link = 'https://forms.gle/ry9FiboPx33XobwK9';
+$ticket_link = 'https://forms.gle/AYAUBBzLPuYbHDx9A';
 
 $header_announcement = '🏆 8th Annual Edition | July 11 & 12, 2026 | Lagos Continental Hotel, Victoria Island';
 $header_urgency = '🔥 EARLY BIRD CLOSING SOON — Save ₦50,000 when you register before the deadline';
